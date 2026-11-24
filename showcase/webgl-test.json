@@ -1,36 +1,43 @@
 {
   "webgl": {
     "ready": true,
-    "ms": 1563
+    "ms": 2556
   },
   "stats": {
-    "meshes": 164,
-    "triangles": 403620,
+    "meshes": 198,
+    "triangles": 585206,
     "backend": "webgl",
     "width": 900,
     "height": 1200,
-    "renderCount": 1
+    "renderCount": 1,
+    "joints": 55,
+    "skinnedMeshes": 84,
+    "rigidMeshes": 114,
+    "skinnedVertices": 162696,
+    "restError": 1.8123462194833054e-7,
+    "facialMorphMeshes": 20,
+    "batches": null
   },
   "front": {
-    "ms": 689
+    "ms": 615
   },
   "three": {
-    "ms": 636
+    "ms": 626
   },
   "right": {
-    "ms": 639
+    "ms": 576
   },
   "back": {
-    "ms": 605
+    "ms": 571
   },
   "left": {
-    "ms": 604
+    "ms": 590
   },
   "detail": {
-    "ms": 564
+    "ms": 533
   },
   "glb": {
-    "ms": 509
+    "ms": 536
   },
   "mobile": {
     "render": [

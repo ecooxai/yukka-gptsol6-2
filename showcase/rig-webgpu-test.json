@@ -1,0 +1,39 @@
+{
+  "meshes": 198,
+  "triangles": 585206,
+  "backend": "webgpu",
+  "width": 900,
+  "height": 1200,
+  "renderCount": 1,
+  "joints": 55,
+  "skinnedMeshes": 84,
+  "rigidMeshes": 114,
+  "skinnedVertices": 162696,
+  "restError": 1.8123462194833054e-7,
+  "facialMorphMeshes": 20,
+  "batches": null,
+  "badWeights": 0,
+  "nonfinite": 0,
+  "maxWeightError": 2.9802322387695312e-8,
+  "movedBones": 10,
+  "animatedFingerTipMotion": 0.014882682217244444,
+  "resetError": 0,
+  "closedMorphs": 20,
+  "morphReset": true,
+  "idleRenderFrames": 52,
+  "glb": {
+    "bytes": 21178964,
+    "skins": 84,
+    "joints": 55,
+    "animations": [
+      {
+        "name": "Quiet breathing, blinking and hair sway",
+        "channels": 30
+      }
+    ],
+    "meshCount": 198,
+    "morphTargets": 20
+  },
+  "errors": [],
+  "ms": 5993
+}

@@ -1,12 +1,12 @@
 {
-  "frames": 778,
-  "seconds": 60.14080000007153,
+  "frames": 817,
+  "seconds": 60.228,
   "mime": "video/webm;codecs=vp9",
   "sizes": [
-    9080820,
-    7992930
+    8737823,
+    7917195
   ],
-  "workHours": "0.47",
+  "workHours": "1.21",
   "history": [
     {
       "n": 1,
@@ -32,30 +32,170 @@
     {
       "n": 4,
       "score": 83,
-      "note": "Pose, pillow and mesh optimization",
+      "note": "Pose and mesh optimization",
       "minutes": 6,
       "url": "./showcase/iterations/iteration-4.png"
     },
     {
       "n": 5,
       "score": 84,
-      "note": "Native WebGPU and final polish",
+      "note": "Native WebGPU and polish",
       "minutes": 7,
       "url": "./showcase/iterations/iteration-5.png"
     },
     {
       "n": 6,
       "score": 83,
-      "note": "Silhouette experiment; pillow collision",
+      "note": "Pillow collision experiment",
       "minutes": 18,
       "url": "./showcase/iterations/iteration-6.png"
     },
     {
       "n": 7,
       "score": 85,
-      "note": "Improved pose and corrected pillow",
+      "note": "Corrected pose and pillow",
       "minutes": 19,
       "url": "./showcase/iterations/iteration-7.png"
+    },
+    {
+      "n": 8,
+      "score": 86,
+      "note": "Reference proportions and asymmetry",
+      "minutes": 28,
+      "url": "./showcase/iterations/iteration-8.png"
+    },
+    {
+      "n": 9,
+      "score": 87,
+      "note": "Closed volumetric fringe and bow",
+      "minutes": 30,
+      "url": "./showcase/iterations/iteration-9.png"
+    },
+    {
+      "n": 10,
+      "score": 88,
+      "note": "Skin pigment and analytic irises",
+      "minutes": 32,
+      "url": "./showcase/iterations/iteration-10.png"
+    },
+    {
+      "n": 11,
+      "score": 89,
+      "note": "Continuous sculpted arms and hands",
+      "minutes": 35,
+      "url": "./showcase/iterations/iteration-11.png"
+    },
+    {
+      "n": 12,
+      "score": 90,
+      "note": "Indexed hands and sewn shorts",
+      "minutes": 36,
+      "url": "./showcase/iterations/iteration-12.png"
+    },
+    {
+      "n": 13,
+      "score": 90,
+      "note": "Collar, pocket and cloth UVs",
+      "minutes": 37,
+      "url": "./showcase/iterations/iteration-13.png"
+    },
+    {
+      "n": 14,
+      "score": 89,
+      "note": "Accessory shape regression",
+      "minutes": 39,
+      "url": "./showcase/iterations/iteration-14.png"
+    },
+    {
+      "n": 15,
+      "score": 91,
+      "note": "Corrected slippers and halo",
+      "minutes": 40,
+      "url": "./showcase/iterations/iteration-15.png"
+    },
+    {
+      "n": 16,
+      "score": 91,
+      "note": "Wraparound collar and cuffs",
+      "minutes": 41,
+      "url": "./showcase/iterations/iteration-16.png"
+    },
+    {
+      "n": 17,
+      "score": 92,
+      "note": "Hair reflection and eyelash shape",
+      "minutes": 43,
+      "url": "./showcase/iterations/iteration-17.png"
+    },
+    {
+      "n": 18,
+      "score": 92,
+      "note": "Reference pose and grip",
+      "minutes": 44,
+      "url": "./showcase/iterations/iteration-18.png"
+    },
+    {
+      "n": 19,
+      "score": 93,
+      "note": "55-joint skeletal character",
+      "minutes": 48,
+      "url": "./showcase/iterations/iteration-19.png"
+    },
+    {
+      "n": 20,
+      "score": 94,
+      "note": "Cel shadow shapes and pillow drape",
+      "minutes": 50,
+      "url": "./showcase/iterations/iteration-20.png"
+    },
+    {
+      "n": 21,
+      "score": 94,
+      "note": "Forehead opening and lapels",
+      "minutes": 52,
+      "url": "./showcase/iterations/iteration-21.png"
+    },
+    {
+      "n": 22,
+      "score": 94,
+      "note": "Mesh batching comparison",
+      "minutes": 53,
+      "url": "./showcase/iterations/iteration-22.png"
+    },
+    {
+      "n": 23,
+      "score": 94,
+      "note": "Optimized geometry and quality profiles",
+      "minutes": 54,
+      "url": "./showcase/iterations/iteration-23.png"
+    },
+    {
+      "n": 24,
+      "score": 94,
+      "note": "Eyes and accessory experiment",
+      "minutes": 55,
+      "url": "./showcase/iterations/iteration-24.png"
+    },
+    {
+      "n": 25,
+      "score": 94,
+      "note": "Corrected knot, bow and placket",
+      "minutes": 57,
+      "url": "./showcase/iterations/iteration-25.png"
+    },
+    {
+      "n": 26,
+      "score": 95,
+      "note": "Blink morphs and GLB animation",
+      "minutes": 60,
+      "url": "./showcase/iterations/iteration-26.png"
+    },
+    {
+      "n": 27,
+      "score": 95,
+      "note": "Seam-connected cuffs and plush details",
+      "minutes": 62,
+      "url": "./showcase/iterations/iteration-27.png"
     }
   ],
   "errors": []
