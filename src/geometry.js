@@ -66,11 +66,11 @@ export function sweep(parent,pts,profile,material,{nu=32,nv=48,axis=[0,0,1],alte
   const out=[p.x,p.y,p.z];if(color)out.push(...color(ang,v,p,t,e,f));return out;
  },material,name);
 }
-export function xyShape(parent,points,zFn,material,name=''){
+export function xyShape(parent,points,zFn,material,name='',uvFn=null){
  const sh=new T.Shape();sh.moveTo(...points[0]);for(const p of points.slice(1))sh.lineTo(...p);sh.closePath();
  const src=new T.ShapeGeometry(sh,24),p=src.attributes.position,idx=src.index,verts=[],uv=[],indices=[],cache=new Map();
  const minX=Math.min(...points.map(p=>p[0])),maxX=Math.max(...points.map(p=>p[0])),minY=Math.min(...points.map(p=>p[1])),maxY=Math.max(...points.map(p=>p[1]));
- function vertex(q){const key=q[0].toFixed(6)+','+q[1].toFixed(6);if(cache.has(key))return cache.get(key);const i=verts.length/3;verts.push(q[0],q[1],zFn(q[0],q[1]));uv.push((q[0]-minX)/Math.max(.001,maxX-minX),(q[1]-minY)/Math.max(.001,maxY-minY));cache.set(key,i);return i;}
+ function vertex(q){const key=q[0].toFixed(6)+','+q[1].toFixed(6);if(cache.has(key))return cache.get(key);const i=verts.length/3;verts.push(q[0],q[1],zFn(q[0],q[1]));uv.push(...(uvFn?uvFn(q[0],q[1]):[(q[0]-minX)/Math.max(.001,maxX-minX),(q[1]-minY)/Math.max(.001,maxY-minY)]));cache.set(key,i);return i;}
  const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
  function split(a,b,c,n){if(n===0){indices.push(vertex(a),vertex(b),vertex(c));return;}const ab=mid(a,b),bc=mid(b,c),ca=mid(c,a);split(a,ab,ca,n-1);split(ab,b,bc,n-1);split(ca,bc,c,n-1);split(ab,bc,ca,n-1);}
  for(let i=0;i<(idx?.count??p.count);i+=3){const q=[];for(let j=0;j<3;j++){const k=idx?idx.getX(i+j):i+j;q.push([p.getX(k),p.getY(k)]);}split(...q,3);}
@@ -88,8 +88,10 @@ export function ringXZ(parent,major,width,height,material,name='',zoffset=0){
   return [r*Math.sin(a),height*Math.sin(b),r*Math.cos(a)+zoffset];
  },material,name);
 }
+let sharedCatTexture;
 export function makeCatTexture(repeatX=4,repeatY=3){
- const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
+ if(sharedCatTexture){const t=sharedCatTexture.clone();t.repeat.set(repeatX,repeatY);t.needsUpdate=true;return t;}
+ const c=document.createElement('canvas');c.width=c.height=1024;const g=c.getContext('2d');g.scale(2,2);
  g.fillStyle='#d2f3fc';g.fillRect(0,0,512,512);
  function cat(x,y,s,angle){g.save();g.translate(x,y);g.rotate(angle);g.scale(s,s);g.lineCap='round';g.lineJoin='round';
   g.strokeStyle='#f7feff';g.lineWidth=5.5;g.beginPath();g.moveTo(-58,-15);g.bezierCurveTo(-63,-33,-64,-64,-49,-65);g.lineTo(-25,-46);g.quadraticCurveTo(0,-54,25,-46);g.lineTo(49,-65);g.bezierCurveTo(63,-64,63,-34,58,-15);g.bezierCurveTo(78,16,68,46,34,51);g.bezierCurveTo(6,60,-27,60,-48,46);g.bezierCurveTo(-70,30,-77,5,-58,-15);g.closePath();g.stroke();
@@ -97,9 +99,26 @@ export function makeCatTexture(repeatX=4,repeatY=3){
   g.fillStyle='#f8fdff';for(const sign of [-1,1]){g.beginPath();g.ellipse(sign*23,9,5.6,8,0,0,2*Math.PI);g.fill();}g.restore();
  }
  for(let j=-1;j<4;j++)for(let i=-1;i<4;i++)cat(i*256+(j%2?128:0)+68,j*256+74,1.03,((i+j)%3-1)*.13);
- const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;tx.wrapS=tx.wrapT=T.RepeatWrapping;tx.repeat.set(repeatX,repeatY);tx.anisotropy=8;return tx;
+ const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;tx.wrapS=tx.wrapT=T.RepeatWrapping;tx.repeat.set(repeatX,repeatY);tx.anisotropy=8;sharedCatTexture=tx;return tx;
 }
 export function makeBlush(){
  const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),gr=g.createRadialGradient(64,64,4,64,64,62);
  gr.addColorStop(0,'rgba(246,126,148,0.26)');gr.addColorStop(.45,'rgba(246,145,163,0.16)');gr.addColorStop(1,'rgba(246,145,163,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;return tx;
+}
+
+// Machined ring with planar annular faces and small rounded bevels.
+export function beveledAnnulus(parent,inner,outer,height,material,name='Halo annulus'){
+ const b=.008,y=height*.5;
+ const profile=[[inner+b,-y],[outer-b,-y],[outer,-y+b],[outer,y-b],[outer-b,y],[inner+b,y],[inner,y-b],[inner,-y+b],[inner+b,-y]];
+ const m=surface(parent,160,64,(u,v)=>{
+  const a=u*2*Math.PI,t=v*(profile.length-1),i=Math.min(profile.length-2,Math.floor(t)),q=t-i,r=mix(profile[i][0],profile[i+1][0],q),h=mix(profile[i][1],profile[i+1][1],q);
+  const out=[r*Math.sin(a),h,r*Math.cos(a)];
+  if(material.vertexColors){
+   const light=.5+.5*Math.sin(a+.70),side=clamp((r-inner)/(outer-inner)),upper=clamp((h+y)/(2*y));
+   const c=C('#202129').lerp(C('#53545b'),.58*side+.17*upper+.22*light).lerp(C('#77787d'),.22*light*upper);
+   out.push(c.r,c.g,c.b);
+  }
+  return out;
+ },material,name);
+ return m;
 }

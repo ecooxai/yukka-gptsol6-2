@@ -7,7 +7,7 @@ export function lensRibbon(parent,material,left,right,{depth=.035,seed=0,name='R
  const L=new T.CatmullRomCurve3(left.map(p=>V(...p)),false,'centripetal');
  const R=new T.CatmullRomCurve3(right.map(p=>V(...p)),false,'centripetal');
  const dark=C('#403a70'),base=C('#625b98'),lit=C('#9a93c2');
- return surface(parent,nu,nv,(u,v)=>{
+ const ribbon=surface(parent,nu,nv,(u,v)=>{
   const l=L.getPoint(v),r=R.getPoint(v),a=u*2*Math.PI,side=Math.cos(a),front=Math.sin(a);
   const p=l.clone().lerp(r,(side+1)/2);
   const thick=depth*Math.sin(Math.PI*v)**.65;
@@ -24,4 +24,11 @@ export function lensRibbon(parent,material,left,right,{depth=.035,seed=0,name='R
   }
   return result;
  },material,name);
+ // Edge curves run in different directions for left/right bows; guarantee
+ // outward normals on the +Z surface rather than accidentally painting its back.
+ const geo=ribbon.geometry,uv=geo.attributes.uv,n=geo.attributes.normal;
+ let closest=0,dist=Infinity;
+ for(let i=0;i<uv.count;i++){const d=(uv.getX(i)-.25)**2+(uv.getY(i)-.5)**2;if(d<dist){dist=d;closest=i;}}
+ if(n.getZ(closest)<0){const ix=geo.index;for(let i=0;i<ix.count;i+=3){const a=ix.getX(i+1);ix.setX(i+1,ix.getX(i+2));ix.setX(i+2,a);}ix.needsUpdate=true;geo.computeVertexNormals();}
+ return ribbon;
 }
