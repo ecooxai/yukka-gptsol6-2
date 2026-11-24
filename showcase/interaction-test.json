@@ -1,0 +1,22 @@
+{
+  "noSilentFallback": true,
+  "explicitFallback": true,
+  "landscape": {
+    "render": [
+      1280,
+      720
+    ],
+    "css": [
+      1278,
+      718
+    ]
+  },
+  "rightView": true,
+  "backView": true,
+  "png": true,
+  "studioStyle": true,
+  "studioGlb": true,
+  "mobileOverflow": false,
+  "ms": 8657,
+  "errors": []
+}

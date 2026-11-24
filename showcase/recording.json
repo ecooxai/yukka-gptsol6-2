@@ -1,0 +1,48 @@
+{
+  "frames": 715,
+  "seconds": 60.02370000004768,
+  "mime": "video/webm;codecs=vp9",
+  "sizes": [
+    7968594,
+    7154799
+  ],
+  "workHours": "0.28",
+  "history": [
+    {
+      "n": 1,
+      "score": 65,
+      "note": "First procedural sculpture",
+      "minutes": 0,
+      "url": "./showcase/iterations/iteration-1.png"
+    },
+    {
+      "n": 2,
+      "score": 76,
+      "note": "Face and garment refinement",
+      "minutes": 1,
+      "url": "./showcase/iterations/iteration-2.png"
+    },
+    {
+      "n": 3,
+      "score": 80,
+      "note": "Cel shading and ink contours",
+      "minutes": 4,
+      "url": "./showcase/iterations/iteration-3.png"
+    },
+    {
+      "n": 4,
+      "score": 83,
+      "note": "Pose, pillow and mesh optimization",
+      "minutes": 6,
+      "url": "./showcase/iterations/iteration-4.png"
+    },
+    {
+      "n": 5,
+      "score": 84,
+      "note": "Native WebGPU and final polish",
+      "minutes": 7,
+      "url": "./showcase/iterations/iteration-5.png"
+    }
+  ],
+  "errors": []
+}

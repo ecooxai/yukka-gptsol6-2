@@ -1,0 +1,47 @@
+{
+  "webgl": {
+    "ready": true,
+    "ms": 1452
+  },
+  "stats": {
+    "meshes": 164,
+    "triangles": 403620,
+    "backend": "webgl",
+    "width": 900,
+    "height": 1200,
+    "renderCount": 1
+  },
+  "front": {
+    "ms": 620
+  },
+  "three": {
+    "ms": 594
+  },
+  "right": {
+    "ms": 595
+  },
+  "back": {
+    "ms": 578
+  },
+  "left": {
+    "ms": 593
+  },
+  "detail": {
+    "ms": 535
+  },
+  "glb": {
+    "ms": 293
+  },
+  "mobile": {
+    "render": [
+      900,
+      1200
+    ],
+    "css": [
+      368,
+      491
+    ],
+    "horizontalOverflow": false
+  },
+  "errors": []
+}
