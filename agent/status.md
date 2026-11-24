@@ -7,3 +7,5 @@ Current state: five reviewed visual iterations, 84/100 subjective quality. Geome
 Known limitations: single reference view, stylized approximations to anatomy/hair/cloth; no skeletal rig, facial morphs, garment simulation, or hand-retopologized topology. Some hair and fabric shapes remain simplified. Video capture is a showcase, not proof of production quality. The requested 200 iterations and 2–3 hour working period have not been achieved in this session.
 
 See agent/iterations.md and agent/continue.md for next steps. No reference image in public deployment.
+
+Interaction test complete: 9.891s, zero errors. Both showcase videos encoded and checked by ffprobe at exactly 60 seconds, 24fps H.264, 1000×1200 and 1600×1000.

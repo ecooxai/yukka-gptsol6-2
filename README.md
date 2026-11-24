@@ -31,3 +31,8 @@ dist/showcase/ contains the model, views, test reports and two creator-branded 6
 
 ## Quality status
 Five visually reviewed model iterations; final self-assessed score 84/100. Both native WebGPU and WebGL 2 were verified. This is an unfinished high-detail procedural reconstruction, not a claim of AAA production readiness or achievement of the requested 98/100 goal.
+
+## Interaction verification
+The independent browser interaction test verifies explicit WebGPU fallback, 1280×720 resolution, side-view controls, PNG and studio-material GLB export, and mobile layout without overflow. See `dist/showcase/interaction-test.json` (9.891s; zero errors).
+
+Public source: https://github.com/ecooxai/yukka-gptsol6-2
