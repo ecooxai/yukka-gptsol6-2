@@ -1,7 +1,7 @@
 {
   "webgl": {
     "ready": true,
-    "ms": 1452
+    "ms": 1563
   },
   "stats": {
     "meshes": 164,
@@ -12,25 +12,25 @@
     "renderCount": 1
   },
   "front": {
-    "ms": 620
+    "ms": 689
   },
   "three": {
-    "ms": 594
+    "ms": 636
   },
   "right": {
-    "ms": 595
+    "ms": 639
   },
   "back": {
-    "ms": 578
+    "ms": 605
   },
   "left": {
-    "ms": 593
+    "ms": 604
   },
   "detail": {
-    "ms": 535
+    "ms": 564
   },
   "glb": {
-    "ms": 293
+    "ms": 509
   },
   "mobile": {
     "render": [

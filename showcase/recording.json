@@ -1,12 +1,12 @@
 {
-  "frames": 715,
-  "seconds": 60.02370000004768,
+  "frames": 778,
+  "seconds": 60.14080000007153,
   "mime": "video/webm;codecs=vp9",
   "sizes": [
-    7968594,
-    7154799
+    9080820,
+    7992930
   ],
-  "workHours": "0.28",
+  "workHours": "0.47",
   "history": [
     {
       "n": 1,
@@ -42,6 +42,20 @@
       "note": "Native WebGPU and final polish",
       "minutes": 7,
       "url": "./showcase/iterations/iteration-5.png"
+    },
+    {
+      "n": 6,
+      "score": 83,
+      "note": "Silhouette experiment; pillow collision",
+      "minutes": 18,
+      "url": "./showcase/iterations/iteration-6.png"
+    },
+    {
+      "n": 7,
+      "score": 85,
+      "note": "Improved pose and corrected pillow",
+      "minutes": 19,
+      "url": "./showcase/iterations/iteration-7.png"
     }
   ],
   "errors": []
