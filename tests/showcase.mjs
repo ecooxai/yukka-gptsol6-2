@@ -1,11 +1,10 @@
 import {chromium} from 'playwright';
-import {mkdir,stat,writeFile} from 'node:fs/promises';
+import {mkdir,stat,writeFile,readFile} from 'node:fs/promises';
 import {performance} from 'node:perf_hooks';
 const env={...process.env};for(const k of ['VK_DRIVER_FILES','VK_ICD_FILENAMES','__NV_PRIME_RENDER_OFFLOAD','__GLX_VENDOR_LIBRARY_NAME','__EGL_VENDOR_LIBRARY_FILENAMES','__VK_LAYER_NV_optimus','DRI_PRIME'])delete env[k];
 const dir='dist/showcase',out='artifacts/showcase';await mkdir(out,{recursive:true});
-const base=await stat('artifacts/iteration-03/front.png'),start=await stat('reference/yuukapa.png');
-const iters=[['03',65,'First procedural sculpture'],['04',76,'Face and garment refinement'],['06',80,'Cel shading and ink contours'],['07',83,'Pose, pillow and mesh optimization'],['08',84,'Native WebGPU and final polish'],['09',83,'Silhouette experiment; pillow collision'],['10',85,'Improved pose and corrected pillow']];
-const history=await Promise.all(iters.map(async([n,score,note],i)=>({n:i+1,score,note,minutes:Math.max(0,Math.round(((await stat('artifacts/iteration-'+n+'/front.png')).mtimeMs-base.mtimeMs)/60000)),url:'./showcase/iterations/iteration-'+(i+1)+'.png'})));
+const iters=JSON.parse(await readFile('agent/history.json','utf8')),base=await stat(iters[0].path),start=await stat('reference/yuukapa.png');
+const history=await Promise.all(iters.map(async h=>({n:h.n,score:h.score,note:h.note,minutes:Math.max(0,Math.round(((await stat(h.path)).mtimeMs-base.mtimeMs)/60000)),url:'./showcase/iterations/iteration-'+h.n+'.png'})));
 const workHours=((Date.now()-start.mtimeMs)/3600000).toFixed(2);
 const b=await chromium.launch({executablePath:'/home/a/.local/archpkg/pacman/usr/lib/chromium/chromium',env,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=gl-egl','--ignore-gpu-blocklist','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows']});
 try{
@@ -21,11 +20,11 @@ try{
    const {ctx,w,h}=spec,land=w>h,footer=112,ch=h-footer;
    const grad=ctx.createRadialGradient(w*.55,ch*.38,0,w*.55,ch*.38,Math.max(w,ch)*.80);grad.addColorStop(0,'#fbfdff');grad.addColorStop(.54,'#eaf5fe');grad.addColorStop(1,'#ccdfef');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
    const modelScale=land?Math.min((ch-8)/source.height,920/source.width):Math.min((ch-6)/source.height,(w-10)/source.width),mw=source.width*modelScale,mh=source.height*modelScale,mx=land?w*.57-mw*.5:(w-mw)*.5,my=(ch-mh)*.5;
-   let phase='FINAL SCULPTURE',caption='Original procedural geometry',iteration=history[history.length-1];
+   let phase='FINAL SCULPTURE',caption='Original procedural geometry · 55-joint rig',iteration=history[history.length-1];
    if(t<40){
     if(t<5){phase='YUUKA';caption='Night routine · anime character study';}
     else if(t<26){phase='360° SCULPTURE';caption='Layered indigo hair · tailored cat-print pajamas';}
-    else if(t<34){phase='FACIAL DETAIL';caption='Violet irises · blush · layered bangs';}
+    else if(t<34){phase='FACIAL DETAIL';caption='Violet irises · blinking · layered bangs';}
     else{phase='FINAL DETAILS';caption='Pillow · bow headband · luminous halo';}
     ctx.drawImage(source,mx,my,mw,mh);
    }else if(t<42){
@@ -43,11 +42,11 @@ try{
     title(ctx,'+'+iteration.minutes+' MIN',bx,by,land?40:31,'#4f5696',800);
     title(ctx,iteration.score+'/100 · SELF SCORE',bx,by+30,land?19:15,'#456078',700);
    }else{
-    title(ctx,'ITERATION 07 · 85/100',land?w-42:w-26,ch-22,land?20:17,'#4a6283',700,'right');
+    title(ctx,'ITERATION '+String(iteration.n).padStart(2,'0')+' · '+iteration.score+'/100',land?w-42:w-26,ch-22,land?20:17,'#4a6283',700,'right');
    }
    ctx.fillStyle='#10151e';ctx.fillRect(0,ch,w,footer);
    title(ctx,'GPT-6.2',w/2,ch+57,50,'#ffffff',800,'center');
-   title(ctx,'CHATGPT · WEB 3D · WORK TIME AT CAPTURE '+workHours+' H',w/2,ch+87,land?18:16,'#b9c7db',600,'center');
+   title(ctx,'CHATGPT · WEB 3D · ELAPSED AT CAPTURE '+workHours+' H',w/2,ch+87,land?18:16,'#b9c7db',600,'center');
   }
   const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm;codecs=vp8';
   const recorders=canvases.map(s=>{const stream=s.c.captureStream(24);const chunks=[];const r=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6000000});r.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};const done=new Promise(resolve=>{r.onstop=()=>resolve(new Blob(chunks,{type:'video/webm'}));});return {r,done,...s};});

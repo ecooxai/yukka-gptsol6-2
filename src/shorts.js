@@ -1,5 +1,5 @@
 import * as T from 'three';
-import {V,clamp,mix,interp,mesh,surface,curve} from './geometry.js';
+import {V,clamp,mix,interp,mesh,surface,curve,mobileQuality} from './geometry.js';
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a));return t*t*(3-2*t);};
 const gauss=(x,w)=>Math.exp(-((x/w)**2));
 const waistY=3.49,waistRX=.53,waistRZ=.284,waistX=-.012,waistZ=-.008;
@@ -8,7 +8,7 @@ const waistY=3.49,waistRX=.53,waistRZ=.284,waistX=-.012,waistZ=-.008;
 // The two leg panels meet at a common curved crotch saddle, not overlapping
 // cylinders. UV seam duplicates share the same positions and averaged normals.
 export function sewnShorts(parent,M){
- const positions=[],uv=[],indices=[],n=96,m=65;
+ const positions=[],uv=[],indices=[],n=mobileQuality?64:96,m=mobileQuality?42:65;
  function append(nu,nv,fn){
   const offset=positions.length/3;
   for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){
@@ -19,27 +19,36 @@ export function sewnShorts(parent,M){
  const legCenter=s=>s*.283;
  function legPoint(s,a,v){
   const sin=Math.sin(a),cos=Math.cos(a),outer=Math.max(0,s*sin),inner=Math.max(0,-s*sin),cx=legCenter(s),cz=s===1?.026:-.018;
-  const topY=waistY-.345*inner**1.10,yy=mix(2.930,topY,v);
-  const [rw,rd,ri]=interp([[0,.315,.241,.255],[.24,.342,.265,.266],[.55,.348,.284,.275],[.78,.333,.278,.270],[1,.29,.267,.25]],v);
+  const topY=waistY-.345*inner**1.10,yy=mix(2.980,topY,v);
+  const [rw,rd,ri]=interp([[0,.307,.246,.253],[.24,.354,.281,.270],[.55,.367,.297,.275],[.78,.344,.286,.270],[1,.29,.267,.25]],v);
   const foldWindow=Math.sin(Math.PI*v);
   // Drape folds follow the leg direction and a fabric gather near the cuff.
   const c1=s*(.33+.72*v),c2=s*(-.55+.40*v),c3=s*(1.72-.56*v);
-  const fold=(.019*gauss(Math.atan2(Math.sin(a-c1),Math.cos(a-c1)),.19)-.025*gauss(Math.atan2(Math.sin(a-c2),Math.cos(a-c2)),.16)+.012*gauss(Math.atan2(Math.sin(a-c3),Math.cos(a-c3)),.24))*foldWindow;
+  const ang=(x)=>Math.atan2(Math.sin(x),Math.cos(x));
+  const gather=gauss(v-.19,.14),diag=s*(.57-1.18*v),innerCrease=s*(-.30-.60*(1-v));
+  const fold=(.029*gauss(ang(a-c1),.19)-.036*gauss(ang(a-c2),.14)+.017*gauss(ang(a-c3),.23))*foldWindow
+    +(.026*gauss(ang(a-diag),.15)-.029*gauss(ang(a-innerCrease),.13)+.014*Math.cos(a*7))*gather*clamp(v*9);
+
   const x0=cx+s*(rw*outer-ri*inner)+sin*fold,z0=cz+(rd+fold)*cos;
   const topX=waistX+s*waistRX*outer,topZ=waistZ+waistRZ*cos;
   const t=smooth(.48,1,v);
-  const x=mix(x0,topX,t),z=mix(z0,topZ,t);
+  let x=mix(x0,topX,t),z=mix(z0,topZ,t);
   const y=yy-.018*(.5+.5*Math.cos(a*7))*clamp(1-v*8)**2;
+  // Maintain positive fabric allowance around the top of the actual thigh.
+  // The correction fades out before the shared crotch and waist boundary.
+  const lx=s===1?.274:-.298,lz=s===1?.05:-.024,rx=.241,rz=.218;
+  const d=Math.hypot((x-lx)/rx,(z-lz)/rz),fade=1-smooth(3.10,3.19,y);
+  if(d<1&&d>1e-5){const k=1+(1/d-1)*fade;x=lx+(x-lx)*k;z=lz+(z-lz)*k;}
   return [x,y,z];
  }
  for(const s of [-1,1]){
   append(n,m,(u,v)=>{
    const a=(u-.5)*2*Math.PI,p=legPoint(s,a,v);
-   return [...p,u,v*.72];
+   return [...p,u+(s===1?-.185:.05),v*.72+.07];
   });
  }
  const keys=[[waistY,waistRX,waistRZ,waistX,waistZ],[3.64,.552,.282,-.018,-.016],[3.78,.52,.274,-.022,-.018],[3.92,.49,.267,-.02,-.02]];
- append(n,34,(u,v)=>{
+ append(n,mobileQuality?22:34,(u,v)=>{
   const a=(u-.5)*2*Math.PI,y=mix(waistY,3.92,v),[rx,rz,cx,cz]=interp(keys,y);
   return [cx+rx*Math.sin(a),y,cz+rz*Math.cos(a),u,.72+.28*v];
  });
@@ -49,24 +58,28 @@ export function sewnShorts(parent,M){
  for(let i=0;i<pa.count;i++){const key=[pa.getX(i),pa.getY(i),pa.getZ(i)].map(v=>Math.round(v*100000)).join(',');let g=groups.get(key);if(!g){g=[];groups.set(key,g);}g.push(i);}
  for(const g of groups.values())if(g.length>1){norm.set(0,0,0);for(const i of g)norm.add(new T.Vector3().fromBufferAttribute(na,i));norm.normalize();for(const i of g)na.setXYZ(i,norm.x,norm.y,norm.z);}
  na.needsUpdate=true;mesh(parent,geo,M.short,'Continuous sewn pajama shorts legs and waist');
- // The lower edge is a real gathered ruffle band with rounded petal lobes.
+ // Every gathered cuff is sewn directly into the leg boundary. Matching
+ // positions remove the old overlapping cloth strips and their z-fighting.
  for(const s of [-1,1]){
   const cx=legCenter(s),cz=s===1?.026:-.018;
-  const lobe=a=>Math.pow(.5+.5*Math.cos(a*7),.57);
+  const lobe=a=>Math.pow(.5+.5*Math.cos(a*7),.66);
   function cuff(a,v,inner=false){
-   const sin=Math.sin(a),cos=Math.cos(a),out=Math.max(0,s*sin),ins=Math.max(0,-s*sin);
-   const scallop=lobe(a),bulge=(.010+.012*scallop)*Math.sin(Math.PI*v);
-   const rw=mix(.320,.309,v)+bulge-(inner?.012:0),ri=mix(.252,.257,v)+bulge*.4-(inner?.009:0),rd=mix(.249,.241,v)+bulge-(inner?.012:0);
-   const x=cx+s*(rw*out-ri*ins),z=cz+rd*cos;
-   const y=mix(2.826-.081*scallop,2.985,v)+(inner?.004:0);
+   const sin=Math.sin(a),cos=Math.cos(a),out=Math.max(0,s*sin),ins=Math.max(0,-s*sin),scallop=lobe(a);
+   const top=legPoint(s,a,0),r=.011+.023*scallop,bulge=r*Math.sin(Math.PI*v)**.85;
+   const rx=.309+bulge,ri=.254+bulge*.42,rd=.252+bulge;
+   let x=cx+s*(rx*out-ri*ins),z=cz+rd*cos;
+   const join=smooth(.42,1,v);x=mix(x,top[0],join);z=mix(z,top[2],join);
+   if(inner){x=mix(x,cx,.048);z=mix(z,cz,.052);}
+   const y=mix(2.823-.091*scallop,top[1],v)+(inner?.003:0);
    return [x,y,z];
   }
   const band=surface(parent,112,32,(u,v)=>cuff((u-.5)*2*Math.PI,v),M.short,'Rounded gathered shorts ruffle');
-  const tex=band.geometry.attributes.uv;for(let i=0;i<tex.count;i++)tex.setY(i,tex.getY(i)*.12);tex.needsUpdate=true;
+  const tex=band.geometry.attributes.uv;for(let i=0;i<tex.count;i++){tex.setX(i,tex.getX(i)+(s===1?-.185:.05));tex.setY(i,tex.getY(i)*.15-.08);}tex.needsUpdate=true;
   surface(parent,112,18,(u,v)=>cuff((u-.5)*2*Math.PI,v,true),M.paleBlue,'Ruffle fabric inner side',true);
+  surface(parent,112,5,(u,v)=>{const a=(u-.5)*2*Math.PI,p=cuff(a,0),q=cuff(a,0,true);return p.map((x,k)=>mix(x,q[k],v));},M.paleBlue,'Turned ruffle hem');
   const edge=[];for(let k=0;k<=112;k++)edge.push(cuff((k/112-.5)*2*Math.PI,0));
-  curve(parent,edge,.0065,M.seam,'Scalloped ruffle stitched hem',112);
-  const top=[];for(let k=0;k<=112;k++)top.push(cuff((k/112-.5)*2*Math.PI,1));
-  curve(parent,top,.006,M.edge,'Elastic gathered top seam',112);
+  curve(parent,edge,.0055,M.seam,'Scalloped ruffle stitched hem',112);
+  const top=[];for(let k=0;k<=112;k++){const a=(k/112-.5)*2*Math.PI,p=cuff(a,1);p[0]+=.003*Math.sin(a);p[2]+=.003*Math.cos(a);top.push(p);}
+  curve(parent,top,.0052,M.seam,'Elastic gathered top seam',112);
  }
 }

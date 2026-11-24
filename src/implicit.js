@@ -1,6 +1,6 @@
 import * as T from 'three';
 import {edgeTable,triTable} from 'three/addons/objects/MarchingCubes.js';
-import {V,interp,mesh} from './geometry.js';
+import {V,interp,mesh,mobileQuality} from './geometry.js';
 
 // Generate a welded implicit surface from multiple tapered elliptical sweeps.
 // A narrow-band rasterizer avoids evaluating every capsule at every grid point.
@@ -17,6 +17,7 @@ function makeSegments(tube){
  return arr;
 }
 export function implicitSweeps(parent,material,tubes,{step=.011,smooth=.012,name='Unified anatomical surface'}={}){
+ if(mobileQuality)step*=1.35;
  const groups=tubes.map(makeSegments),segments=groups.flat();
  const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];
  for(const s of segments)for(let k=0;k<3;k++){

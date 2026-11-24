@@ -13,7 +13,7 @@ Requirements: Node.js 22 or later and a modern browser.
 
 Use WebGPU by default, or select WebGL 2 explicitly. The renderer supports fixed portrait/landscape resolutions through 4K, front/back/side/detail views, drag-orbit, zoom, alternative studio shading, three lighting presets, transparent PNG and GLB export.
 
-Query options: backend=webgpu or webgl; style=cel or studio; res=900x1200; view=front; showcase=1; quality=ultra.
+Query options: backend=webgpu or webgl; style=cel or studio; res=900x1200; view=front; showcase=1; quality=high, ultra or mobile; batch=1 is an experimental opt-in.
 
 ## Tests on Ruby
 
@@ -27,12 +27,12 @@ Start a Vite production preview on a free port, then:
 Monitor resource usage at one-second intervals with tests/monitor.sh. The CSV values are host-wide CPU/memory plus aggregate Chromium and Node RSS, not isolated per-process scene memory.
 
 ## Outputs
-dist/showcase/ contains the model, views, test reports and two creator-branded 60-second showcase videos. The source archive is dist/src.tar.gz. The GLB represents the static pose and is not rigged; browser cel contours are separate from the exported model.
+dist/showcase/ contains the model, views, test reports and two creator-branded 60-second showcase videos. The source archive is dist/src.tar.gz. The GLB includes 55 articulated joints, 20 facial morph meshes, and a six-second breathing/blink/hair animation. Browser ink contours are separate from the exported model.
 
 ## Quality status
-Seven visually reviewed model iterations; final self-assessed score 85/100. Both native WebGPU and WebGL 2 were verified. This is an unfinished high-detail procedural reconstruction, not a claim of AAA production readiness or achievement of the requested 98/100 goal.
+27 visually reviewed model iterations; checkpoint self-assessed score 95/100. Both native WebGPU and WebGL 2 were verified. This is an unfinished high-detail procedural reconstruction, not a claim of AAA production readiness or achievement of the requested 98/100 goal.
 
 ## Interaction verification
-The independent browser interaction test verifies explicit WebGPU fallback, 1280×720 resolution, side-view controls, PNG and studio-material GLB export, and mobile layout without overflow. See `dist/showcase/interaction-test.json` (9.891s; zero errors).
+The independent browser interaction test verifies explicit WebGPU fallback, 1280×720 resolution, side-view controls, PNG and studio-material GLB export, and mobile layout without overflow. See `dist/showcase/interaction-test.json` and rig-test reports.
 
 Public source: https://github.com/ecooxai/yukka-gptsol6-2

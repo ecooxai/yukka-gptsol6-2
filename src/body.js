@@ -25,7 +25,7 @@ function shirtZ(x,y){
 }
 function shirtUV(x,y){
  const [rx,rz,cx]=interp(shirtKeys,clamp(y,3.69,5.62));
- return [.5+Math.asin(clamp((x-cx)/Math.max(.1,rx),-.995,.995))/(2*Math.PI)+.065,(y-3.69)/(5.62-3.69)+.08];
+ const a=Math.asin(clamp((x-cx)/Math.max(.1,rx),-.995,.995));return [.5+(a<0?a+2*Math.PI:a)/(2*Math.PI)+.065,(y-3.69)/(5.62-3.69)+.08];
 }
 function roundedContour(points,r=.18){
  const result=[];
@@ -42,25 +42,32 @@ function shirt(parent,M){
  sweep(parent,[[-.026,5.46,.025],[-.027,5.65,.027],[-.027,5.87,.023]],[[0,.205,.17],[.32,.144,.145],[.74,.142,.142],[1,.169,.145]],M.skin,{name:'Neck'});
  // Front neckline is cut directly into the garment surface, not painted over.
  const frontY=(ang)=>{const front=Math.max(0,Math.cos(ang));return .77*front**12+.15*front**5;};
- rings(parent,shirtKeys,M.fabric,{nu:112,nv:100,name:'Cat print tailored shirt',alter:(p,a,v,rx,rz)=>{
-  const front=Math.max(0,Math.cos(a)),fold=shirtFold(a,p[1]);
-  p[0]+=Math.sin(a)*fold;p[2]+=Math.cos(a)*fold;
-  const neck=frontY(a);p[1]-=neck*clamp((v-.70)/.30)**2.2;
-  p[1]+= (.025*Math.sin(a*3+.6)+.014*Math.sin(a*7)+.065*Math.exp(-(((a+.065)/.083)**2)))*Math.max(0,1-v*7);
-  return p;
- }});
+ const hemOffset=a=>-.052*Math.max(0,Math.cos(a))**2+.033*Math.sin(a)**2+.016*Math.sin(a*3+.6)+.009*Math.sin(a*7)+.090*Math.exp(-(((a+.065)/.083)**2));
+ let last=-1,row;
+ const shirtSurface=surface(parent,128,112,(u,v)=>{
+  const y=mix(3.69,5.62,v);if(v!==last){row=interp(shirtKeys,y);last=v;}
+  const [rx,rz,cx,cz]=row,opening=.035*(1-clamp(v/.16))**1.5;
+  // Both edges meet at the button placket above the free lower hem.
+  const a=mix(opening,2*Math.PI-opening,u),aSigned=a>Math.PI?a-2*Math.PI:a,front=Math.max(0,Math.cos(a));
+  const fold=shirtFold(aSigned,y),x=cx+(rx+fold)*Math.sin(a),z=cz+(rz+fold)*Math.cos(a);
+  return [x,y-frontY(aSigned)*clamp((v-.70)/.30)**2.2+hemOffset(aSigned)*Math.max(0,1-v*7),z];
+ },M.fabric,'Cat print tailored shirt');
+ const suv=shirtSurface.geometry.attributes.uv;for(let i=0;i<suv.count;i++)suv.setX(i,suv.getX(i)+.5);suv.needsUpdate=true;
  // Shirt hem is a subtle rolled seam, follows the natural asymmetric drape.
- const hem=[];for(let i=0;i<=96;i++){const a=-Math.PI+2*Math.PI*i/96;hem.push([-.064+.615*Math.sin(a),3.697+.025*Math.sin(a*3+.6)+.014*Math.sin(a*7)+.065*Math.exp(-(((a+.065)/.083)**2)),.024+.310*Math.cos(a)]);}
- curve(parent,hem,.012,M.seam,'Rolled bottom hem',96);
- const left=[[-.27,5.58],[-.405,5.55],[-.55,5.44],[-.49,5.30],[-.365,5.24],[-.433,5.12],[-.284,4.99],[-.119,4.85],[-.023,4.96],[-.140,5.22],[-.211,5.44]];
- const right=[[.263,5.58],[.407,5.53],[.55,5.42],[.476,5.30],[.336,5.25],[.453,5.12],[.403,5.04],[.215,4.99],[-.023,4.96],[.14,5.23],[.205,5.43]];
+ const hem=[];for(let i=0;i<=112;i++){const a=mix(.035,2*Math.PI-.035,i/112),s=a>Math.PI?a-2*Math.PI:a;hem.push([-.064+.615*Math.sin(a),3.697+hemOffset(s),.024+.310*Math.cos(a)]);}
+ curve(parent,hem,.0085,M.seam,'Rolled bottom hem',96);
+ const left=[[-.23,5.60],[-.355,5.59],[-.49,5.52],[-.48,5.40],[-.34,5.30],[-.405,5.21],[-.464,5.11],[-.390,5.015],[-.245,4.93],[-.108,4.84],[-.034,4.955],[-.144,5.21],[-.19,5.43]];
+ const right=[[.237,5.595],[.378,5.56],[.52,5.49],[.512,5.38],[.442,5.31],[.306,5.26],[.405,5.17],[.445,5.08],[.382,5.01],[.220,4.978],[-.034,4.958],[.135,5.23],[.192,5.43]];
  // Sculpted broad contrasting lapels with piping.
- function collarZ(x,y){const front=shirtZ(x,y);return front+.032+.055*Math.exp(-(((y-5.25)/.24)**2))*Math.max(0,1-Math.abs(x)*1.2);}
+ function collarZ(x,y){const front=shirtZ(x,y);return front+.028+.065*Math.exp(-(((y-5.31)/.28)**2))*Math.max(0,1-Math.abs(x)*1.15)+.018*Math.exp(-(((x-.33)/.15)**2+((y-5.18)/.22)**2));}
  for(const [raw,name] of [[left,'Left pajama lapel'],[right,'Right pajama lapel']]){
-  const pts=roundedContour(raw,.19);
+  const pts=roundedContour(raw,.36);
   xyShape(parent,pts,collarZ,M.white,name);
-  const path=pts.concat([pts[0]]).map(([x,y])=>[x,y,collarZ(x,y)+.008]);
-  curve(parent,path,.0075,M.seam,'Contrasting lapel piping',64);
+  // A narrow fabric wall closes the edge; the seam remains a separate bead.
+  const perimeter=new T.CatmullRomCurve3(pts.map(([x,y])=>V(x,y,collarZ(x,y))),true,'centripetal');
+  surface(parent,100,5,(u,v)=>{const q=perimeter.getPoint(u);return [q.x,q.y,q.z-.013*v];},M.whiteShadow,name+' turned fabric edge',true);
+  const path=pts.concat([pts[0]]).map(([x,y])=>[x,y,collarZ(x,y)+.006]);
+  curve(parent,path,.0058,M.seam,'Contrasting lapel piping',64);
  }
  // A wrap-around collar band continues behind the neck and joins the
  // notched front lapels. Hair naturally occludes most of the rear portion.
@@ -72,8 +79,8 @@ function shirt(parent,M){
  const backPipe=[];for(let i=0;i<=88;i++)backPipe.push(collarBand(i/88,1));
  curve(parent,backPipe,.007,M.seam,'Wraparound collar piping',88);
  // Button placket follows the fabric, with a seam and pearly buttons.
- const placket=[[-.016,4.94],[-.043,4.74],[-.042,4.50],[-.053,4.26],[-.066,4.03],[-.071,3.80],[-.046,3.70]];
- curve(parent,placket.map(([x,y])=>[x,y,shirtZ(x,y)+.017]),.013,M.seam,'Center button placket',64);
+ const placket=[[-.016,4.94],[-.043,4.74],[-.042,4.50],[-.053,4.26],[-.066,4.03],[-.071,3.80],[-.046,3.665]];
+ curve(parent,placket.map(([x,y])=>[x,y,shirtZ(x,y)+.014]),.009,M.seam,'Center button placket',64);
  curve(parent,placket.map(([x,y])=>[x+.037,y,shirtZ(x+.037,y)+.009]),.0055,M.edge,'Placket topstitch',64);
  for(const [x,y] of [[-.045,4.79],[-.05,4.48],[-.058,4.15],[-.066,3.83]]){
   const z=shirtZ(x,y)+.027;
@@ -90,7 +97,7 @@ function shirt(parent,M){
  for(const p of [
  [[-.47,4.89],[-.42,4.55],[-.46,4.25]],[[-.21,4.12],[-.29,3.90],[-.33,3.76]],
  [[.43,4.46],[.40,4.17],[.49,3.91]],[[.12,4.81],[.10,4.53],[.14,4.36]]
- ])curve(parent,p.map(([x,y])=>[x,y,shirtZ(x,y)+.004]),.005,M.paleBlue,'Subtle tailoring fold',32);
+ ])curve(parent,p.map(([x,y])=>[x,y,shirtZ(x,y)+.004]),.0032,M.paleBlue,'Subtle tailoring fold',32);
 }
 function sleeves(parent,M){
  const paths=[
@@ -138,6 +145,11 @@ function arms(parent,M){
  [[1.028,3.103,.196],[1.10,3.09,.243],[1.16,3.047,.24],[1.167,3.007,.225]]
  ];
  implicitSweeps(parent,M.skin,[{points:holdingArm,profile:holdingProfile,samples:48},...grip.map((points,i)=>({points:points.map(p=>[p[0],p[1]+.080,p[2]]),profile:fingerProfile,samples:11,smooth:i===4?.012:.008}))],{step:.012,smooth:.012,name:'Relaxed pillow-holding arm and unified grip'});
+ for(const [i,f] of grip.entries()){
+  const tip=f.at(-1),prev=f.at(-2),angle=-Math.atan2(tip[0]-prev[0],tip[1]-prev[1]);
+  ellipsoid(parent,M.nail,[tip[0],tip[1]+.080,tip[2]+.007],[.009,.012,.003],[0,0,angle],'Holding hand nail '+(i+1));
+ }
+
 }
 function shorts(parent,M){sewnShorts(parent,M);}
 function legs(parent,M){
@@ -148,7 +160,7 @@ function legs(parent,M){
 }
 function slipper(parent,M,center,rot){
  const g=group(parent,'Plush bedroom slipper');g.position.set(...center);g.rotation.y=rot;
- const outline=(a)=>{const c=Math.cos(a);return [.242*(.90+.10*c)*Math.sin(a),.125+.355*c];};
+ const outline=(a)=>{const c=Math.cos(a);return [.268*(.88+.12*c)*Math.sin(a),.125+.355*c];};
  // Beveled sole with rounded toe and narrower heel.
  surface(g,112,18,(u,v)=>{const a=u*2*Math.PI,[x,z]=outline(a),r=.96+.04*Math.sin(Math.PI*v);return [x*r,.025+.073*v,.125+(z-.125)*r];},M.sole,'Soft blue-gray outsole');
  surface(g,96,16,(u,v)=>{const a=u*2*Math.PI,[x,z]=outline(a);return [x*v,.026,.125+(z-.125)*v];},M.sole,'Closed slipper sole');
@@ -158,29 +170,32 @@ function slipper(parent,M,center,rot){
  const opening=(a)=>[.092*Math.sin(a),-.082+.113*Math.cos(a)];
  surface(g,112,50,(u,v)=>{
   const a=u*2*Math.PI,[ox,oz]=outline(a),[ix,iz]=opening(a),c=Math.cos(a),front=.5+.5*c;
-  const puff=Math.sin(Math.PI*v)**.66*(.086+.109*front);
+  const puff=Math.sin(Math.PI*v)**.70*(.080+.225*front**1.85);
   const fluff=.0045*Math.sin(a*17+v*13)*Math.sin(Math.PI*v)**2+.003*Math.cos(a*29-v*11);
-  return [mix(ox,ix,v)*(1+.075*Math.sin(Math.PI*v)*front+.022*Math.sin(a*12)*Math.sin(Math.PI*v)),mix(.098,.185,v)+puff+fluff,mix(oz,iz,v)];
+  const t=v**1.39,bulge=1+.15*Math.sin(Math.PI*v)**.80+.022*Math.sin(a*12)*Math.sin(Math.PI*v);
+  return [mix(ox,ix,t)*bulge,mix(.098,.185,v)+puff+fluff,mix(oz,iz,t)];
  },M.white,'Plush slipper padded upper');
  surface(g,96,16,(u,v)=>{const a=u*2*Math.PI,[x,z]=opening(a);return [x*(1-.06*v),mix(.185,.105,v),-.082+(z+.082)*(1-.06*v)];},M.whiteShadow,'Slipper inner lining');
  const rim=[];for(let i=0;i<=96;i++){const [x,z]=opening(i/96*2*Math.PI);rim.push([x,.185,z]);}curve(g,rim,.009,M.whiteShadow,'Soft opening rim',96);
- const bow=group(g,'Rose ribbon');bow.position.set(0,.337,.280);bow.rotation.x=-.34;
+ const bow=group(g,'Rose ribbon');bow.position.set(0,.444,.308);bow.rotation.x=-.36;
  for(const s of [-1,1]){
-  ellipsoid(bow,M.pink,[s*.064,0,0],[.068,.037,.022],[0,0,s*.15],'Ribbon loop');
-  ellipsoid(bow,M.pinkDark,[s*.030,-.008,.014],[.026,.016,.007],[0,0,s*.08],'Ribbon crease');
+  ellipsoid(bow,M.pink,[s*.064,0,0],[.078,.032,.022],[0,0,s*.15],'Ribbon loop');
+  ellipsoid(bow,M.pinkDark,[s*.030,-.008,.014],[.029,.014,.007],[0,0,s*.08],'Ribbon crease');
  }
- ellipsoid(bow,M.pink,[0,.002,.011],[.025,.029,.024],null,'Ribbon knot');
+ ellipsoid(bow,M.pink,[0,.002,.011],[.024,.025,.024],null,'Ribbon knot');
 }
 function pillow(parent,M){
- const g=group(parent,'Soft white bed pillow');g.position.set(1.18,1.98,-.18);g.rotation.set(.33,.03,-.55);
- const hw=.76,hh=.94;
+ const g=group(parent,'Soft white bed pillow');g.rotation.set(.33,.03,-.47);
+ const hw=.755,hh=.995;
+ const grip=V(-.76,.94,-.068).applyEuler(new T.Euler(.33,.03,-.55)).add(V(1.18,1.98,-.18));
+ g.position.copy(grip.sub(V(-hw,hh,-.068).applyEuler(g.rotation)));
  function coord(u,v,sign){
-  const drape=Math.max(0,-u)*Math.max(0,-v);const x=u*hw*(1-.095*(1-v*v))+.022*Math.sin(v*4.2)*(u+1)/2-.18*drape,y=v*hh*(1-.064*(1-u*u))+.024*Math.sin(u*3.3)*(v+1)/2;
+  const drape=Math.max(0,-u)*Math.max(0,-v),hang=((1-v)/2)**1.65;const x=u*hw*(1-.095*(1-v*v))+.022*Math.sin(v*4.2)*(u+1)/2-.18*drape-.34*hang,y=v*hh*(1-.064*(1-u*u))+.024*Math.sin(u*3.3)*(v+1)/2-.11*hang;
   const edge=Math.max(0,(1-u*u)*(1-v*v)),puff=.30*Math.pow(edge,.43);
   const fold1=.061*Math.exp(-(((u+.72+(v-.75)*.19)/.095)**2))*Math.exp(-(((v-.62)/.38)**2));
   const fold2=.044*Math.exp(-(((u-.75-(v+.45)*.23)/.12)**2))*Math.exp(-(((v+.52)/.46)**2));
   const pinch=.068*Math.exp(-((u+1)**2+(v-1)**2)/.11);const gripFold=.067*Math.exp(-(((u+.80+(1-v)*.47)/.095)**2))*Math.exp(-(((v-.62)/.48)**2));
-  return [x,y,sign*(puff-(fold1+fold2+gripFold)*Math.sqrt(edge))+.015*Math.sin(u*3+v*3)*edge-pinch-.13*drape];
+  return [x,y,sign*(puff-(fold1+fold2+gripFold)*Math.sqrt(edge))+.015*Math.sin(u*3+v*3)*edge-pinch-.13*drape-.20*hang];
  }
  surface(g,96,112,(u,v)=>coord(u*2-1,v*2-1,1),M.pillow,'Inflated pillow front');
  surface(g,96,112,(u,v)=>coord(u*2-1,v*2-1,-1),M.whiteShadow,'Inflated pillow back',true);

@@ -1,0 +1,164 @@
+[
+  {
+    "n": 1,
+    "score": 65,
+    "note": "First procedural sculpture",
+    "path": "artifacts/iteration-03/front.png"
+  },
+  {
+    "n": 2,
+    "score": 76,
+    "note": "Face and garment refinement",
+    "path": "artifacts/iteration-04/front.png"
+  },
+  {
+    "n": 3,
+    "score": 80,
+    "note": "Cel shading and ink contours",
+    "path": "artifacts/iteration-06/front.png"
+  },
+  {
+    "n": 4,
+    "score": 83,
+    "note": "Pose and mesh optimization",
+    "path": "artifacts/iteration-07/front.png"
+  },
+  {
+    "n": 5,
+    "score": 84,
+    "note": "Native WebGPU and polish",
+    "path": "artifacts/iteration-08/front.png"
+  },
+  {
+    "n": 6,
+    "score": 83,
+    "note": "Pillow collision experiment",
+    "path": "artifacts/iteration-09/front.png"
+  },
+  {
+    "n": 7,
+    "score": 85,
+    "note": "Corrected pose and pillow",
+    "path": "artifacts/iteration-10/front.png"
+  },
+  {
+    "n": 8,
+    "score": 86,
+    "note": "Reference proportions and asymmetry",
+    "path": "artifacts/refine-08/front.png"
+  },
+  {
+    "n": 9,
+    "score": 87,
+    "note": "Closed volumetric fringe and bow",
+    "path": "artifacts/refine-09/front.png"
+  },
+  {
+    "n": 10,
+    "score": 88,
+    "note": "Skin pigment and analytic irises",
+    "path": "artifacts/refine-10/front.png"
+  },
+  {
+    "n": 11,
+    "score": 89,
+    "note": "Continuous sculpted arms and hands",
+    "path": "artifacts/refine-11/front.png"
+  },
+  {
+    "n": 12,
+    "score": 90,
+    "note": "Indexed hands and sewn shorts",
+    "path": "artifacts/refine-12/front.png"
+  },
+  {
+    "n": 13,
+    "score": 90,
+    "note": "Collar, pocket and cloth UVs",
+    "path": "artifacts/refine-13/front.png"
+  },
+  {
+    "n": 14,
+    "score": 89,
+    "note": "Accessory shape regression",
+    "path": "artifacts/refine-14/front.png"
+  },
+  {
+    "n": 15,
+    "score": 91,
+    "note": "Corrected slippers and halo",
+    "path": "artifacts/refine-15/front.png"
+  },
+  {
+    "n": 16,
+    "score": 91,
+    "note": "Wraparound collar and cuffs",
+    "path": "artifacts/refine-16/front.png"
+  },
+  {
+    "n": 17,
+    "score": 92,
+    "note": "Hair reflection and eyelash shape",
+    "path": "artifacts/refine-17/front.png"
+  },
+  {
+    "n": 18,
+    "score": 92,
+    "note": "Reference pose and grip",
+    "path": "artifacts/refine-18/front.png"
+  },
+  {
+    "n": 19,
+    "score": 93,
+    "note": "55-joint skeletal character",
+    "path": "artifacts/refine-19/front.png"
+  },
+  {
+    "n": 20,
+    "score": 94,
+    "note": "Cel shadow shapes and pillow drape",
+    "path": "artifacts/refine-20/front.png"
+  },
+  {
+    "n": 21,
+    "score": 94,
+    "note": "Forehead opening and lapels",
+    "path": "artifacts/refine-21/front.png"
+  },
+  {
+    "n": 22,
+    "score": 94,
+    "note": "Mesh batching comparison",
+    "path": "artifacts/refine-22/front.png"
+  },
+  {
+    "n": 23,
+    "score": 94,
+    "note": "Optimized geometry and quality profiles",
+    "path": "artifacts/refine-23/front.png"
+  },
+  {
+    "n": 24,
+    "score": 94,
+    "note": "Eyes and accessory experiment",
+    "path": "artifacts/refine-24/front.png"
+  },
+  {
+    "n": 25,
+    "score": 94,
+    "note": "Corrected knot, bow and placket",
+    "path": "artifacts/refine-25/front.png"
+  },
+  {
+    "n": 26,
+    "score": 95,
+    "note": "Blink morphs and GLB animation",
+    "path": "artifacts/refine-26-fixed/front.png"
+  },
+  {
+    "n": 27,
+    "score": 95,
+    "note": "Seam-connected cuffs and plush details",
+    "path": "artifacts/refine-27/front.png"
+  }
+]

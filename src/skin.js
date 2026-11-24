@@ -9,7 +9,7 @@ export function paintSkin(model,M){
  model.updateMatrixWorld(true);
  const normal=new T.Vector3(),point=new T.Vector3(),normalMat=new T.Matrix3();
  const faceLight=C('#fff6f1'),faceShadow=C('#e4b9b7'),faceDeep=C('#c7909a');
- const bodyLight=C('#fff0e9'),bodyShade=C('#e6b6b5'),bodyDeep=C('#ca959c');
+ const bodyLight=C('#fff4ed'),bodyShade=C('#e4b3b2'),bodyDeep=C('#d39c9f');
  const direction=new T.Vector3(-.38,.73,.61).normalize();
  model.traverse(o=>{
   if(!o.isMesh||o.material!==M.skin)return;
@@ -32,17 +32,34 @@ export function paintSkin(model,M){
    }else{
     normal.applyMatrix3(normalMat).normalize();point.applyMatrix4(o.matrixWorld);
     const light=normal.dot(direction);
-    const transition=smooth(-.08,.43,light);
+    const transition=smooth(.035,.195,light);
     c=blend(bodyShade,bodyLight,transition);
-    c.lerp(bodyDeep,.34*smooth(.02,.8,-light));
+    c.lerp(bodyDeep,.28*smooth(.02,.8,-light));
     if(/Neck|Covered upper body/.test(o.name)){
      const collarShadow=smooth(5.22,5.69,point.y);
      c.lerp(C('#d8a7a6'),.70*collarShadow);
     }
-    if(/Rear weight-bearing leg/.test(o.name))c.lerp(bodyShade,.46);
+    if(/Raised anatomically tapered arm/.test(o.name)){
+     const elbowShadow=(1-smooth(5.46,5.53,point.y+.13*(point.x+1.08)))*smooth(-.22,.70,normal.z);
+     c.lerp(bodyShade,.55*elbowShadow);
+    }
+    if(/Relaxed pillow-holding arm/.test(o.name)){
+     const cuff=smooth(4.30,4.44,point.y+.055*Math.sin(point.x*26)+.06*normal.x)*smooth(-.25,.60,normal.z);
+     c.lerp(bodyShade,.83*cuff);
+     const wrist=(1-smooth(3.28,3.43,point.y))*smooth(-.1,.75,normal.z);
+     c.lerp(bodyShade,.72*wrist);
+    }
     if(/leg/i.test(o.name)){
-     const knee=Math.exp(-(((point.y-2.22)/.23)**2))*smooth(.15,.9,normal.z);
-     c.lerp(C('#e9bdb8'),.10*knee);
+     const f=smooth(.10,.80,normal.z);
+     const cuff=smooth(2.78,2.91,point.y+.058*Math.cos(point.x*19))*f;
+     c.lerp(bodyShade,.78*cuff);
+     if(/Rear weight-bearing/.test(o.name)){
+      const calfShade=(1-smooth(2.03,2.17,point.y+.10*Math.cos(point.x*18)))*f;
+      c.lerp(bodyShade,.80*calfShade+.10);
+     }else{
+      const knee=Math.exp(-(((point.y-2.15)/.12)**2))*Math.exp(-(((normal.x+.30)/.23)**2))*f;
+      c.lerp(bodyShade,.38*knee);
+     }
     }
    }
    colors[i*3]=c.r;colors[i*3+1]=c.g;colors[i*3+2]=c.b;

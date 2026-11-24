@@ -18,4 +18,4 @@ Check git status and worktrees before starting, create a model-named branch, pre
 
 Do not publish to ChatGPT Sites, Library, or Space without explicit permission. Public cloud deployment requested in task.md. Do not publish the reference PNG. Only commit project source and intentional outputs; never include credentials, node_modules, or raw base64. Update agent/status.md and agent/continue.md before handoff.
 
-Latest checkpoint: iteration 07, subjective 85/100. The target remains 98/100. Read agent/status.md and agent/continue.md for remaining work.
+Latest checkpoint: iteration 27, subjective 95/100. The target remains 98/100. Read agent/status.md and agent/continue.md for remaining work.

@@ -1,0 +1,5 @@
+import {chromium} from 'playwright';
+const env={...process.env};for(const k of ['VK_DRIVER_FILES','VK_ICD_FILENAMES','__NV_PRIME_RENDER_OFFLOAD','__GLX_VENDOR_LIBRARY_NAME','__EGL_VENDOR_LIBRARY_FILENAMES','__VK_LAYER_NV_optimus','DRI_PRIME'])delete env[k];
+const b=await chromium.launch({executablePath:'/home/a/.local/archpkg/pacman/usr/lib/chromium/chromium',env,headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=gl-egl','--ignore-gpu-blocklist']});
+try{const p=await b.newPage();await p.goto('http://127.0.0.1:4201/?backend=webgl&batch=0');await p.waitForFunction(()=>window.__viewer?.ready);
+console.log(JSON.stringify(await p.evaluate(()=>{const v=window.__viewer,all=[];v.model.traverse(o=>{if(o.isMesh)all.push({name:o.name,tri:o.geometry.index?.count/3??o.geometry.attributes.position.count/3,v:o.geometry.attributes.position.count,skin:o.isSkinnedMesh||false});});return {top:all.sort((a,b)=>b.tri-a.tri).slice(0,25),sum:all.reduce((s,o)=>s+o.tri,0),vertices:all.reduce((s,o)=>s+o.v,0)};})));}finally{await b.close();}

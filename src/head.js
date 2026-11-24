@@ -3,7 +3,7 @@ import {lensRibbon} from './ribbons.js';
 import {V,C,clamp,mix,interp,group,mesh,ellipsoid,surface,rings,sweep,curve,patch,ringXZ,beveledAnnulus} from './geometry.js';
 
 const headKeys=[
- [-.60,.016,.023,0,.135],[-.56,.113,.147,0,.112],[-.47,.232,.252,0,.078],[-.35,.352,.337,0,.042],[-.21,.456,.411,0,.014],[-.06,.514,.447,0,-.009],[.12,.520,.458,0,-.018],[.30,.507,.443,0,-.038],[.46,.447,.382,0,-.051],[.59,.307,.282,0,-.048],[.68,.135,.14,0,-.044],[.706,.001,.001,0,-.044]
+ [-.575,.016,.023,0,.135],[-.54,.118,.147,0,.112],[-.45,.246,.252,0,.078],[-.35,.365,.337,0,.042],[-.21,.456,.411,0,.014],[-.06,.514,.447,0,-.009],[.12,.520,.458,0,-.018],[.30,.507,.443,0,-.038],[.46,.447,.382,0,-.051],[.59,.307,.282,0,-.048],[.68,.135,.14,0,-.044],[.706,.001,.001,0,-.044]
 ];
 function faceZ(x,y){
  const [rx,rz,cx,cz]=interp(headKeys,y);
@@ -11,13 +11,14 @@ function faceZ(x,y){
 }
 function smoothLocal(a,b,x){const t=clamp((x-a)/(b-a));return t*t*(3-2*t);}
 function eye(parent,M,sign){
- const x0=sign*.212,y0=-.077,rx=.171;
- const eyeLimits=(xx)=>{const u=clamp((xx-x0)/rx,-1,1),f=Math.max(0,1-u*u)**.62,tilt=sign*u*.017;return [y0-.070*f+tilt,y0+.088*f+tilt+.008*Math.sin(Math.PI*(u+1)/2)];};
+ const before=parent.children.length;
+ const x0=sign*.224,y0=-.082+(sign>0?.003:-.004),rx=.145;
+ const eyeLimits=(xx)=>{const u=clamp((xx-x0)/rx,-1,1),f=Math.max(0,1-u*u)**.62,tilt=sign*u*.017;return [y0-.064*f+tilt,y0+.088*f+tilt+.006*Math.sin(Math.PI*(u+1)/2)];};
  const z=(x,y,offset=0)=>faceZ(x,y)+.013+offset;
  surface(parent,48,20,(u,v)=>{const x=x0+rx*(2*u-1),[lo,hi]=eyeLimits(x),y=mix(lo,hi,v),c=C('#fffaff').lerp(C('#d7d2e7'),.60*v**4);return [x,y,z(x,y),c.r,c.g,c.b];},M.eyeWhite,'Almond eye white');
  // Violet irises, radial pigment, limbic ring and hand-drawn fibers.
- const ix=x0-sign*.013,iy=y0+.019,iw=.093,ih=.102;
- const dark=C('#333059'),mid=C('#6251ac'),bright=C('#a9a0f2'),deep=C('#443780'),blue=C('#6b9de4');
+ const ix=x0-sign*.013,iy=y0+.019,iw=.080,ih=.098;
+ const dark=C('#312b55'),mid=C('#6149ad'),bright=C('#b1a2ee'),deep=C('#413079'),blue=C('#709ce8');
  // Clip the iris analytically to the upper/lower lid, without duplicated
  // polar vertices or folded triangles along the edge.
  surface(parent,88,60,(u,v)=>{
@@ -26,21 +27,21 @@ function eye(parent,M,sign){
   const y=mix(low,high,v),a=Math.atan2((y-iy)/ih,q),radius=clamp(Math.hypot(q,(y-iy)/ih));
   const top=(Math.sin(a)+1)/2,ray=.5+.5*Math.sin(a*37+Math.sin(a*8)*2);
   const c=deep.clone().lerp(mid,clamp((radius-.20)*1.8)).lerp(bright,(1-top)*.75*clamp(radius*1.8));
-  c.lerp(blue,.29*(1-top)*Math.exp(-(((radius-.75)/.18)**2)));
+  c.lerp(blue,.38*(1-top)*Math.exp(-(((radius-.75)/.18)**2)));
   c.lerp(dark,clamp((radius-.87)*8));
   c.lerp(bright,ray*.23*Math.sin(radius*Math.PI));
-  c.lerp(dark,top*.42);
+  c.lerp(dark,top*.52);
   return [x,y,z(x,y,.005),c.r,c.g,c.b];
  },M.iris,'Layered violet iris');
- patch(parent,ix,iy+.019,.029,.045,(x,y)=>z(x,y,.010),M.eyeInk,'Pupil');
- patch(parent,ix-.034,iy+.041,.019,.016,(x,y)=>z(x,y,.016),M.eyeLight,'Large catchlight');
- patch(parent,ix+.034,iy-.045,.011,.014,(x,y)=>z(x,y,.017),M.eyeLight,'Secondary catchlight');
+ patch(parent,ix,iy+.021,.025,.042,(x,y)=>z(x,y,.010),M.eyeInk,'Pupil');
+ patch(parent,ix-.030,iy+.044,.014,.016,(x,y)=>z(x,y,.016),M.eyeLight,'Large catchlight');
+ patch(parent,ix+.031,iy-.045,.009,.012,(x,y)=>z(x,y,.017),M.eyeLight,'Secondary catchlight');
  patch(parent,ix-.035,iy-.051,.006,.008,(x,y)=>z(x,y,.016),M.irisSpark,'Tiny blue iris reflection');
  patch(parent,ix+.049,iy+.016,.004,.006,(x,y)=>z(x,y,.016),M.irisSpark,'Peripheral iris reflection');
  // Variable-thickness upper lash ribbon, rather than floating eyeliner.
  surface(parent,64,8,(u,v)=>{
   const x=x0+rx*(2*u-1),[,hi]=eyeLimits(x),outer=sign===1?u:1-u;
-  const y=hi+v*(.004+.022*Math.sin(Math.PI*u)**.75+.024*outer**4);
+  const y=hi+v*(.003+.025*Math.sin(Math.PI*u)**.75+.028*outer**4);
   return [x,y,z(x,y,.012)];
  },M.eyeInk,'Upper eyelashes');
  const outer=x0+sign*rx;
@@ -53,8 +54,24 @@ function eye(parent,M,sign){
   return [x,y,z(x,y,.013)];
  },M.eyeInk,'Tapered outer eyelash');
  surface(parent,48,4,(u,v)=>{const x=x0+rx*(2*u-1),[lo]=eyeLimits(x);const y=lo-v*.0034*Math.sin(u*Math.PI)*(sign===1?Math.pow(u,1.7):Math.pow(1-u,1.7));return [x,y,z(x,y,.011)];},M.eyebrow,'Lower lash line',true);
- const browY=.151;
- curve(parent,[[x0-sign*(sign<0?.093:.138),browY-.01,faceZ(x0-sign*(sign<0?.093:.138),browY-.01)+.012],[x0,browY+.034,faceZ(x0,browY+.034)+.012],[x0+sign*(sign<0?.080:.125),browY+.018,faceZ(x0+sign*(sign<0?.080:.125),browY+.018)+.01]],.0058,M.eyebrow,'Delicate eyebrow',24);
+ const browY=.135;
+ curve(parent,[[x0-sign*(sign<0?.087:.121),browY-.01,faceZ(x0-sign*(sign<0?.087:.121),browY-.01)+.012],[x0,browY+.018,faceZ(x0,browY+.018)+.012],[x0+sign*(sign<0?.073:.116),browY+.009,faceZ(x0+sign*(sign<0?.073:.116),browY+.009)+.01]],.0058,M.eyebrow,'Delicate eyebrow',24);
+ // Real eyelid morphs follow the convex face rather than collapsing a texture.
+ // The lids meet on a gently curved line; pigment layers retreat beneath skin.
+ for(const o of parent.children.slice(before)){
+  if(!o.isMesh||o.name==='Delicate eyebrow')continue;
+  const p=o.geometry.attributes.position,closed=new Float32Array(p.count*3),lash=/lash/i.test(o.name),sideName=sign<0?'R':'L';
+  for(let i=0;i<p.count;i++){
+   const x=p.getX(i),u=clamp((x-x0)/rx,-1,1);
+   const center=y0-.018*(1-u*u)+sign*u*.017;
+   const [,upper]=eyeLimits(clamp(x,x0-rx,x0+rx));
+   const y=lash?/Lower/.test(o.name)?center-.003+(p.getY(i)-y0)*.018:center+(p.getY(i)-upper)*.65:center+(p.getY(i)-y0)*.015;
+   const zc=faceZ(x,y)+(lash?.018:-.008);
+   closed[3*i]=x;closed[3*i+1]=y;closed[3*i+2]=zc;
+  }
+  const target=new T.BufferAttribute(closed,3);target.name='Blink';o.geometry.morphAttributes.position=[target];o.updateMorphTargets();o.name=sideName+' '+o.name;
+ }
+
 }
 function hairLock(parent,M,pts,w,d,seed=0,name='Hair lock'){
  const colors=[C('#3d3965'),C('#504b81'),C('#6d67a2'),C('#a39bd1')];
@@ -100,6 +117,13 @@ function hair(parent,M){
  [[.35,.34,-.26],[.54,-.25,-.45],[.76,-.93,-.51],[1.01,-1.58,-.43],[1.18,-2.05,-.28],[1.07,-2.30,-.21]],
  [[-.43,.18,-.17],[-.60,-.44,-.22],[-.75,-1.03,-.18],[-1.03,-1.46,-.11],[-1.29,-1.62,-.05],[-1.42,-1.57,-.03]]
  ];secondary.forEach((p,i)=>hairLock(parent,M,p.map((q,j)=>j===0?[q[0],q[1]-.025,q[2]+.065]:q),[.060,.084,.086,.091,.075,.045][i],.039,16+i,'Layered rear strand '+(i+1)));
+ // Recessed hair curtain prevents the gaps between overlapping rear locks
+ // from exposing isolated scalp or appearing like separate rigid ribbons.
+ surface(parent,80,68,(u,v)=>{
+  const y=mix(.35,-2.10,v),[w,depth,cx,cz]=interp([[-2.10,.12,.055,.19,-.34],[-1.85,.43,.09,.19,-.40],[-1.40,.69,.15,.16,-.48],[-.85,.67,.17,.085,-.46],[-.32,.55,.20,.025,-.40],[.35,.42,.19,0,-.29]],y),a=(u-.5)*Math.PI*2;
+  const tail=Math.sin(Math.PI*v)**.3,x=cx+w*Math.sin(a),z=cz+depth*Math.cos(a),c=C('#453e70').lerp(C('#655c94'),.20+.25*Math.max(0,-Math.cos(a))*tail);
+  return [x,y,z,c.r,c.g,c.b];
+ },M.hair,'Interior hair curtain',true);
  // Side strands, cheeks and asymmetric face framing.
  lensRibbon(parent,M.hair,
   [[-.27,.61,.08],[-.43,.47,.17],[-.55,.23,.15],[-.565,-.12,.12],[-.49,-.39,.12],[-.29,-.55,.12]],
@@ -116,11 +140,21 @@ function hair(parent,M){
  const fringes=[
  {l:[[-.17,.675,.06],[-.36,.60,.32],[-.48,.36,.36],[-.49,.10,.35],[-.47,-.11,.31],[-.37,-.31,.27]],r:[[-.17,.675,.06],[-.22,.57,.39],[-.34,.35,.43],[-.36,.12,.43],[-.38,-.06,.39],[-.37,-.31,.27]],d:.037},
  {l:[[-.09,.702,.065],[-.28,.57,.37],[-.37,.37,.43],[-.35,.15,.44],[-.31,.025,.43],[-.27,-.043,.39]],r:[[-.09,.702,.065],[-.16,.59,.43],[-.20,.39,.49],[-.22,.20,.49],[-.23,.075,.46],[-.27,-.043,.39]],d:.043},
- {l:[[.035,.710,.060],[-.15,.62,.37],[-.25,.44,.45],[-.18,.26,.48],[-.075,.12,.48],[.080,.025,.46],[.195,-.014,.41]],r:[[.035,.710,.060],[.085,.62,.37],[.067,.44,.47],[.055,.26,.49],[.120,.12,.47],[.174,.035,.44],[.195,-.014,.41]],d:.053},
- {l:[[.087,.695,.055],[.125,.62,.36],[.160,.47,.42],[.186,.31,.43],[.223,.15,.42],[.31,-.07,.34]],r:[[.087,.695,.055],[.255,.61,.34],[.345,.48,.38],[.367,.29,.37],[.351,.09,.36],[.31,-.07,.34]],d:.039},
+ {l:[[.035,.710,.060],[-.15,.62,.37],[-.245,.44,.455],[-.188,.26,.49],[-.128,.10,.485],[-.019,-.008,.465],[.150,-.053,.418]],r:[[.035,.710,.060],[.100,.62,.38],[.121,.48,.473],[.104,.34,.494],[.114,.20,.480],[.119,.082,.463],[.150,-.053,.418]],d:.051},
+ {l:[[.087,.695,.055],[.133,.62,.36],[.148,.49,.448],[.205,.35,.445],[.228,.20,.43],[.238,.10,.412],[.31,-.055,.34]],r:[[.087,.695,.055],[.255,.61,.34],[.345,.49,.38],[.367,.34,.37],[.351,.20,.36],[.344,.08,.35],[.31,-.055,.34]],d:.039},
  {l:[[.24,.65,.025],[.33,.53,.25],[.40,.37,.32],[.43,.14,.31],[.43,-.10,.27],[.36,-.28,.22]],r:[[.24,.65,.025],[.45,.49,.21],[.52,.33,.24],[.51,.09,.22],[.46,-.14,.22],[.36,-.28,.22]],d:.039},
  ];
  fringes.forEach((o,i)=>lensRibbon(parent,M.hair,o.l,o.r,{depth:o.d,seed:i*2,name:'Sculpted fringe lock '+(i+1),pigment:true}));
+ lensRibbon(parent,M.hair,
+ [[-.160,.585,.39],[-.220,.45,.486],[-.231,.30,.508],[-.200,.15,.497],[-.166,.055,.471],[-.143,-.044,.417]],
+ [[-.160,.585,.39],[-.166,.45,.489],[-.174,.30,.506],[-.159,.15,.492],[-.143,.045,.456],[-.143,-.044,.417]],
+ {depth:.018,seed:12,name:'Fine fringe accent lock',pigment:true});
+ lensRibbon(parent,M.hair,
+ [[-.088,.39,.45],[-.142,.24,.493],[-.110,.12,.495],[-.035,.011,.473],[.091,-.073,.433]],
+ [[-.088,.39,.45],[-.101,.24,.501],[-.059,.13,.506],[.010,.015,.482],[.091,-.073,.433]],
+ {depth:.014,seed:18,name:'Thin central tapered bang',pigment:true});
+
+
  hairLock(parent,M,[[-.22,.65,.04],[-.41,.60,.07],[-.61,.64,.03],[-.65,.75,.02],[-.59,.83,.01]],.047,.023,9,'Signature ahoge');
  // Fine directional locks soften the broad sculpted hair masses.
  const fine=[
@@ -136,13 +170,13 @@ function hair(parent,M){
  [[-.43,.31,-.12],[-.61,-.43,-.13],[-.56,-.74,-.08],[-.67,-.96,-.01]],
  [[.49,.25,-.05],[.64,-.35,-.10],[.69,-.84,-.06],[.64,-1.07,.02]],
  [[1.01,-1.44,-.25],[1.34,-1.86,-.18],[1.42,-2.13,-.14],[1.28,-2.40,-.11]],
- [[-.74,-1.19,-.23],[-1.12,-1.46,-.19],[-1.40,-1.49,-.15],[-1.50,-1.47,-.12]]
+ [[-.74,-1.19,-.23],[-1.12,-1.46,-.19],[-1.42,-1.60,-.15],[-1.54,-1.57,-.12]]
  ];wisps.forEach((p,i)=>hairLock(parent,M,p,.026,.015,i,'Fine silhouette strand'));
  const flyaways=[
  [[-.45,.29,-.03],[-.58,-.06,.02],[-.63,-.42,-.02],[-.59,-.66,-.09],[-.49,-.77,-.12]],
  [[.48,.29,-.02],[.62,-.22,-.09],[.67,-.63,-.11],[.61,-.91,-.07],[.53,-1.02,-.03]],
  [[1.11,-1.48,-.22],[1.40,-1.85,-.19],[1.48,-2.12,-.12],[1.38,-2.35,-.08]],
- [[-.72,-1.22,-.19],[-.99,-1.51,-.15],[-1.27,-1.72,-.08],[-1.49,-1.72,-.03]]
+ [[-.72,-1.22,-.19],[-.99,-1.54,-.15],[-1.28,-1.75,-.08],[-1.53,-1.76,-.03]]
  ];flyaways.forEach((p,i)=>hairLock(parent,M,p,.011,.007,24+i,'Fine loose hair strand'));
 
 }
@@ -150,16 +184,21 @@ function bow(parent,M){
  // Padded fabric headband: rounded closed cross-section rather than a flat strip.
  surface(parent,112,28,(u,v)=>{
   const a=mix(-.22,Math.PI+.22,u),b=v*2*Math.PI,taper=.70+.30*Math.sin(Math.PI*u)**.4;
-  const radial=.030*Math.cos(b)*taper+.009*Math.sin(u*36);
+  const radial=.039*Math.cos(b)*taper+.014*Math.sin(u*36);
   const x=Math.cos(a)*(.602+radial),y=.025+Math.sin(a)*(.745+radial);
   const z=-.027+.139*Math.sin(b)*taper+.005*Math.sin(u*42);
   return [x,y,z];
  },M.white,'Padded sleep headband',true);
  for(const side of [-1,1]){
-  const pts=[];for(let i=0;i<=64;i++){const u=i/64,a=mix(-.22,Math.PI+.22,u),taper=.70+.30*Math.sin(Math.PI*u)**.4;pts.push([Math.cos(a)*(.603+.009*Math.sin(u*36)),.025+Math.sin(a)*(.745+.009*Math.sin(u*36)),-.027+side*.133*taper+.005*Math.sin(u*42)]);}
+  const pts=[];for(let i=0;i<=64;i++){const u=i/64,a=mix(-.22,Math.PI+.22,u),taper=.70+.30*Math.sin(Math.PI*u)**.4;pts.push([Math.cos(a)*(.603+.014*Math.sin(u*36)),.025+Math.sin(a)*(.745+.014*Math.sin(u*36)),-.027+side*.133*taper+.005*Math.sin(u*42)]);}
   curve(parent,pts,.006,M.whiteShadow,'Fine headband stitch',64);
  }
- ellipsoid(parent,M.white,[.005,.742,.045],[.13,.095,.114],[0,0,.12],'Bow knot');
+ surface(parent,52,32,(u,v)=>{
+  const a=u*2*Math.PI,b=v*Math.PI,r=Math.sin(b),ridge=1+.085*Math.cos(a*3+1.1)*r;
+  return [.005+.112*r*Math.cos(a)*ridge,.742+.088*Math.cos(b)+.012*r*Math.sin(a),.045+.108*r*Math.sin(a)*ridge];
+ },M.white,'Folded fabric bow knot');
+ curve(parent,[[-.038,.678,.125],[-.052,.727,.150],[-.041,.784,.127]],.004,M.whiteShadow,'Bow knot left fold');
+ curve(parent,[[.041,.685,.120],[.058,.737,.142],[.045,.786,.119]],.004,M.whiteShadow,'Bow knot right fold');
  lensRibbon(parent,M.white,
   [[-.055,.75,.10],[-.18,.86,.077],[-.31,.96,.055],[-.46,.95,.027],[-.61,.89,.006]],
   [[-.055,.75,.10],[-.19,.73,.095],[-.35,.75,.063],[-.50,.81,.037],[-.61,.89,.006]],
@@ -180,12 +219,12 @@ export function createHead(parent,M){
   ellipsoid(h,M.skinShadow,[s*.513,-.17,.019],[.036,.082,.021],[0,0,s*.22],'Ear inner fold');
   eye(h,M,s);
   surface(h,24,24,(u,v)=>{const x=s*.29+(u-.5)*.27,y=-.241+(v-.5)*.155;return [x,y,faceZ(x,y)+.007];},M.blush,'Soft cheek blush');
-  for(let i=0;i<8;i++){const x=s*.285+(i-3.5)*.0135,y=-.248+.003*Math.sin(i*1.8),l=.012+.011*Math.sin(Math.PI*(i+.5)/8);curve(h,[[x-.006,y-l,faceZ(x-.006,y-l)+.008],[x+.006,y+l,faceZ(x+.006,y+l)+.008]],.0011,M.blushStroke,'Cheek blush stroke',8);}
+  for(let i=0;i<10;i++){const x=s*.286+(i-4.5)*.0118,y=-.248+.003*Math.sin(i*1.8),l=.014+.013*Math.sin(Math.PI*(i+.5)/10);curve(h,[[x-.006,y-l,faceZ(x-.006,y-l)+.008],[x+.006,y+l,faceZ(x+.006,y+l)+.008]],.0011,M.blushStroke,'Cheek blush stroke',8);}
  }
  // Subtle sculpted nose, mouth and chin detail.
  
  patch(h,-.012,-.200,.008,.004,(x,y)=>faceZ(x,y)+.012,M.skinShadow,'Nose shadow');
- curve(h,[[-.026,-.376,faceZ(-.026,-.376)+.005],[-.006,-.372,faceZ(-.006,-.372)+.008],[.014,-.375,faceZ(.014,-.375)+.008],[.025,-.377,faceZ(.025,-.377)+.005]],.0028,M.lip,'Small neutral mouth',24);
+ curve(h,[[-.026,-.375,faceZ(-.026,-.375)+.006],[-.008,-.369,faceZ(-.008,-.369)+.008],[.012,-.378,faceZ(.012,-.378)+.008],[.025,-.382,faceZ(.025,-.382)+.006]],.0028,M.lip,'Small neutral mouth',24);
  hair(h,M);bow(h,M);
  const halo=group(parent,'Floating graphite and cyan halo');halo.position.set(.015,7.27,-.015);halo.rotation.set(.075,0,-.08);
  beveledAnnulus(halo,.615,.750,.077,M.halo,'Graphite halo body');
