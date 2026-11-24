@@ -2,7 +2,7 @@ import * as T from 'three';
 import {mat,flat,makeCatTexture,makeBlush} from './geometry.js';
 export function materials(){
  return {
- skin:mat('#ffe0d9',{roughness:.87}),skinShadow:mat('#eac0bf'),
+ skin:mat('#fff1e9',{roughness:.87}),skinShadow:mat('#eac0bf'),
  fabric:mat('#ffffff',{map:makeCatTexture(2.1,1.4),roughness:.96,side:T.DoubleSide}),
  sleeve:mat('#ffffff',{map:makeCatTexture(1.1,.65),roughness:.96,side:T.DoubleSide}),
  short:mat('#ffffff',{map:makeCatTexture(1.2,.75),roughness:.96,side:T.DoubleSide}),

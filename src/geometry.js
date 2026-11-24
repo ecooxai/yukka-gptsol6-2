@@ -10,7 +10,7 @@ skinRamp.minFilter=skinRamp.magFilter=T.LinearFilter;skinRamp.generateMipmaps=fa
 export const mat=(color,opts={})=>{
  if(new URLSearchParams(location.search).get('style')!=='studio'&&!(opts.metalness>0)&&!opts.emissive){
   const {roughness,metalness,...rest}=opts;
-  return new T.MeshToonMaterial({color,gradientMap:color==='#ffe0d9'||color==='#eac0bf'?skinRamp:toonRamp,...rest});
+  return new T.MeshToonMaterial({color,gradientMap:color==='#fff1e9'||color==='#eac0bf'?skinRamp:toonRamp,...rest});
  }
  return new T.MeshStandardMaterial({color,roughness:.82,metalness:0,...opts});
 };
@@ -101,5 +101,5 @@ export function makeCatTexture(repeatX=4,repeatY=3){
 }
 export function makeBlush(){
  const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),gr=g.createRadialGradient(64,64,4,64,64,62);
- gr.addColorStop(0,'rgba(246,126,148,0.36)');gr.addColorStop(.45,'rgba(246,145,163,0.22)');gr.addColorStop(1,'rgba(246,145,163,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;return tx;
+ gr.addColorStop(0,'rgba(246,126,148,0.26)');gr.addColorStop(.45,'rgba(246,145,163,0.16)');gr.addColorStop(1,'rgba(246,145,163,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;return tx;
 }
