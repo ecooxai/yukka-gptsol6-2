@@ -30,7 +30,7 @@ Monitor resource usage at one-second intervals with tests/monitor.sh. The CSV va
 dist/showcase/ contains the model, views, test reports and two creator-branded 60-second showcase videos. The source archive is dist/src.tar.gz. The GLB represents the static pose and is not rigged; browser cel contours are separate from the exported model.
 
 ## Quality status
-Five visually reviewed model iterations; final self-assessed score 84/100. Both native WebGPU and WebGL 2 were verified. This is an unfinished high-detail procedural reconstruction, not a claim of AAA production readiness or achievement of the requested 98/100 goal.
+Seven visually reviewed model iterations; final self-assessed score 85/100. Both native WebGPU and WebGL 2 were verified. This is an unfinished high-detail procedural reconstruction, not a claim of AAA production readiness or achievement of the requested 98/100 goal.
 
 ## Interaction verification
 The independent browser interaction test verifies explicit WebGPU fallback, 1280×720 resolution, side-view controls, PNG and studio-material GLB export, and mobile layout without overflow. See `dist/showcase/interaction-test.json` (9.891s; zero errors).

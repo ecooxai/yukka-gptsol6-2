@@ -38,7 +38,7 @@ function eye(parent,M,sign){
  curve(parent,[[x0-sign*.138,browY-.01,faceZ(x0-sign*.138,browY-.01)+.012],[x0,browY+.042,faceZ(x0,browY+.042)+.012],[x0+sign*.125,browY+.018,faceZ(x0+sign*.125,browY+.018)+.01]],.010,M.eyebrow,'Delicate eyebrow',24);
 }
 function hairLock(parent,M,pts,w,d,seed=0,name='Hair lock'){
- const colors=[C('#45416e'),C('#565084'),C('#716ba2'),C('#a39bd1')];
+ const colors=[C('#3d3965'),C('#504b81'),C('#6d67a2'),C('#a39bd1')];
  return sweep(parent,pts,[[0,w*.12,d*.34],[.13,w*.72,d*.77],[.36,w,d*.83],[.57,w*.91,d*.60],[.75,w*.55,d*.36],[.90,w*.18,d*.13],[1,.0007,.0007]],M.hair,{
   nu:36,nv:64,name,
   alter:(p,t,e,f,a,v,wr,dr)=>{const ridge=.024*Math.sin(a*5+seed+v*.9)*Math.sin(Math.PI*v);p.addScaledVector(f,dr*ridge);},
@@ -78,11 +78,11 @@ function hair(parent,M){
  hairLock(parent,M,[[.43,.45,.08],[.57,.06,.09],[.57,-.38,.10],[.47,-.62,.04],[.33,-.64,.03]],.093,.049,6,'Right lower lock');
  // Layered fringe, sweeping across the forehead.
  const fringe=[
- {p:[[-.18,.68,.11],[-.34,.57,.35],[-.44,.32,.43],[-.43,.09,.43],[-.47,-.18,.35],[-.39,-.33,.28]],w:.114,d:.049},
+ {p:[[-.18,.68,.11],[-.34,.57,.35],[-.44,.32,.43],[-.43,.09,.43],[-.47,-.19,.35],[-.37,-.38,.29]],w:.114,d:.049},
  {p:[[-.12,.70,.18],[-.22,.56,.42],[-.25,.30,.49],[-.30,.14,.48],[-.33,.025,.43]],w:.126,d:.050},
- {p:[[.04,.71,.17],[-.08,.62,.43],[-.12,.39,.49],[-.077,.22,.50],[.035,.104,.49],[.173,.013,.44]],w:.157,d:.052},
+ {p:[[.04,.71,.17],[-.08,.62,.43],[-.12,.39,.49],[-.077,.22,.50],[.027,.085,.49],[.191,-.030,.44]],w:.157,d:.052},
  {p:[[.08,.71,.15],[.02,.57,.43],[-.025,.39,.48],[.035,.22,.49],[.155,.082,.45]],w:.086,d:.039},
- {p:[[.14,.70,.14],[.33,.57,.32],[.408,.38,.38],[.437,.16,.40],[.407,-.04,.37],[.353,-.21,.30]],w:.107,d:.053},
+ {p:[[.14,.70,.14],[.33,.57,.32],[.408,.38,.38],[.437,.16,.40],[.425,-.08,.36],[.365,-.24,.30]],w:.107,d:.053},
  {p:[[.25,.64,.07],[.42,.48,.27],[.49,.28,.34],[.47,.02,.32],[.51,-.11,.24]],w:.102,d:.052}
  ];
  fringe.forEach((o,i)=>hairLock(parent,M,o.p,o.w,o.d,i*1.9,'Fringe lock '+(i+1)));
@@ -108,13 +108,13 @@ function bow(parent,M){
  // Padded fabric headband: rounded closed cross-section rather than a flat strip.
  surface(parent,112,28,(u,v)=>{
   const a=mix(-.22,Math.PI+.22,u),b=v*2*Math.PI,taper=.70+.30*Math.sin(Math.PI*u)**.4;
-  const radial=.022*Math.cos(b)*taper+.004*Math.sin(u*36);
-  const x=Math.cos(a)*(.575+radial),y=.025+Math.sin(a)*(.745+radial);
+  const radial=.030*Math.cos(b)*taper+.004*Math.sin(u*36);
+  const x=Math.cos(a)*(.602+radial),y=.025+Math.sin(a)*(.745+radial);
   const z=-.082+.139*Math.sin(b)*taper+.005*Math.sin(u*42);
   return [x,y,z];
  },M.white,'Padded sleep headband',true);
  for(const side of [-1,1]){
-  const pts=[];for(let i=0;i<=64;i++){const u=i/64,a=mix(-.22,Math.PI+.22,u),taper=.70+.30*Math.sin(Math.PI*u)**.4;pts.push([Math.cos(a)*(.577+.004*Math.sin(u*36)),.025+Math.sin(a)*(.745+.004*Math.sin(u*36)),-.082+side*.133*taper+.005*Math.sin(u*42)]);}
+  const pts=[];for(let i=0;i<=64;i++){const u=i/64,a=mix(-.22,Math.PI+.22,u),taper=.70+.30*Math.sin(Math.PI*u)**.4;pts.push([Math.cos(a)*(.603+.004*Math.sin(u*36)),.025+Math.sin(a)*(.745+.004*Math.sin(u*36)),-.082+side*.133*taper+.005*Math.sin(u*42)]);}
   curve(parent,pts,.006,M.whiteShadow,'Fine headband stitch',64);
  }
  ellipsoid(parent,M.white,[.005,.742,.045],[.13,.095,.114],[0,0,.12],'Bow knot');
@@ -140,8 +140,8 @@ export function createHead(parent,M){
  curve(h,[[-.030,-.377,faceZ(-.030,-.377)+.006],[-.010,-.369,faceZ(-.010,-.369)+.009],[.010,-.371,faceZ(.010,-.371)+.009],[.031,-.379,faceZ(.031,-.379)+.006]],.0032,M.lip,'Small neutral mouth',24);
  hair(h,M);bow(h,M);
  const halo=group(parent,'Floating graphite and cyan halo');halo.position.set(-.015,7.20,-.015);halo.rotation.set(.075,0,-.08);
- ringXZ(halo,.64,.075,.038,M.halo,'Graphite halo body');
- const edge=ringXZ(halo,.697,.010,.025,M.haloEdge,'Machined rim');edge.position.y=.006;
- const glow=ringXZ(halo,.587,.012,.009,M.cyan,'Continuous blue inner light');glow.position.y=-.024;
+ ringXZ(halo,.68,.071,.038,M.halo,'Graphite halo body');
+ const edge=ringXZ(halo,.735,.010,.025,M.haloEdge,'Machined rim');edge.position.y=.006;
+ const glow=ringXZ(halo,.629,.012,.009,M.cyan,'Continuous blue inner light');glow.position.y=-.024;
  return h;
 }

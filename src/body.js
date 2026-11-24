@@ -2,7 +2,7 @@ import * as T from 'three';
 import {V,C,clamp,mix,interp,group,mesh,ellipsoid,surface,rings,sweep,curve,patch,xyShape} from './geometry.js';
 
 const shirtKeys=[
- [3.69,.575,.295,-.044,.024],[3.78,.586,.316,-.037,.013],[4.00,.525,.302,-.029,.003],[4.29,.477,.272,-.022,-.012],[4.56,.486,.289,-.011,-.002],[4.85,.526,.324,0,.017],[5.12,.544,.330,.005,.010],[5.37,.596,.273,0,-.011],[5.51,.542,.239,0,-.018],[5.62,.302,.184,0,-.019]
+ [3.69,.615,.310,-.064,.024],[3.78,.602,.322,-.057,.013],[4.00,.535,.302,-.049,.003],[4.29,.477,.272,-.022,-.012],[4.56,.486,.289,-.011,-.002],[4.85,.526,.324,0,.017],[5.12,.544,.330,.005,.010],[5.37,.596,.273,0,-.011],[5.51,.542,.239,0,-.018],[5.62,.302,.184,0,-.019]
 ];
 function shirtZ(x,y){
  const [rx,rz,cx,cz]=interp(shirtKeys,clamp(y,3.69,5.62));
@@ -22,7 +22,7 @@ function shirt(parent,M){
   return p;
  }});
  // Shirt hem is a subtle rolled seam, follows the natural asymmetric drape.
- const hem=[];for(let i=0;i<=96;i++){const a=-Math.PI+2*Math.PI*i/96;hem.push([-.044+.575*Math.sin(a),3.697+.025*Math.sin(a*3+.6)+.014*Math.sin(a*7)+.065*Math.exp(-(((a+.065)/.083)**2)),.024+.295*Math.cos(a)]);}
+ const hem=[];for(let i=0;i<=96;i++){const a=-Math.PI+2*Math.PI*i/96;hem.push([-.064+.615*Math.sin(a),3.697+.025*Math.sin(a*3+.6)+.014*Math.sin(a*7)+.065*Math.exp(-(((a+.065)/.083)**2)),.024+.310*Math.cos(a)]);}
  curve(parent,hem,.012,M.seam,'Rolled bottom hem',96);
  const left=[[-.27,5.58],[-.405,5.55],[-.55,5.44],[-.49,5.30],[-.365,5.24],[-.433,5.12],[-.284,4.99],[-.119,4.85],[-.023,4.96],[-.140,5.22],[-.211,5.44]];
  const right=[[.263,5.58],[.407,5.53],[.55,5.42],[.476,5.30],[.336,5.25],[.453,5.12],[.403,5.04],[.215,4.99],[-.023,4.96],[.14,5.23],[.205,5.43]];
@@ -57,15 +57,15 @@ function shirt(parent,M){
 function sleeves(parent,M){
  const paths=[
  [[-.42,5.40,-.004],[-.59,5.405,.006],[-.76,5.36,.025],[-.89,5.30,.048]],
- [[.43,5.40,-.005],[.60,5.24,.012],[.686,5.04,.022],[.729,4.86,.024]]
+ [[.43,5.40,-.005],[.60,5.24,.012],[.686,4.98,.022],[.748,4.70,.024]]
  ];
  for(let i=0;i<2;i++){
-  const p=paths[i],prof=[[0,.205,.19],[.20,.268,.225],[.48,.252,.217],[.78,.236,.205],[1,.235,.204]];
+  const p=paths[i],prof=[[0,.205,.19],[.20,.268,.225],[.48,.252,.217],[.78,.245,.210],[1,.249,.216]];
   const scallop=(q,t,e,f,a,v)=>q.addScaledVector(t,.072*(.5+.5*Math.cos(a*6))*clamp((v-.68)/.32)**3);
   sweep(parent,p,prof,M.sleeve,{nu:80,nv:56,alter:scallop,name:i?'Hanging scalloped sleeve':'Raised scalloped sleeve'});
   const path=new T.CatmullRomCurve3(p.map(v=>V(...v)),false,'centripetal');
   const c=path.getPoint(1),t=path.getTangent(1).normalize(),e=new T.Vector3().crossVectors(t,V(0,0,1)).normalize(),f=new T.Vector3().crossVectors(t,e).normalize();
-  const edge=[];for(let k=0;k<=96;k++){const a=2*Math.PI*k/96;const q=c.clone().addScaledVector(e,.235*Math.cos(a)).addScaledVector(f,.204*Math.sin(a)).addScaledVector(t,.072*(.5+.5*Math.cos(a*6)));edge.push(q);}
+  const edge=[];for(let k=0;k<=96;k++){const a=2*Math.PI*k/96;const q=c.clone().addScaledVector(e,.249*Math.cos(a)).addScaledVector(f,.216*Math.sin(a)).addScaledVector(t,.072*(.5+.5*Math.cos(a*6)));edge.push(q);}
   curve(parent,edge,.013,M.edge,'White scalloped cuff piping',96);
   // A darker inside rim makes the cuff look like actual cloth.
   const inner=edge.map(q=>q.clone().lerp(c,.09).addScaledVector(t,-.012));curve(parent,inner,.011,M.paleBlue,'Cuff inner seam',96);
@@ -114,7 +114,7 @@ function shorts(parent,M){
  }
 }
 function legs(parent,M){
- sweep(parent,[[-.298,2.91,-.024],[-.31,2.54,-.055],[-.33,2.12,-.08],[-.34,1.83,-.08],[-.32,1.46,-.16],[-.26,.94,-.34],[-.244,.55,-.37]],[[0,.19,.177],[.17,.182,.166],[.37,.14,.142],[.45,.126,.123],[.58,.142,.125],[.73,.103,.095],[.92,.072,.068],[1,.077,.073]],M.skin,{nu:48,nv:96,name:'Rear weight-bearing leg'});
+ sweep(parent,[[-.298,2.91,-.024],[-.31,2.54,-.055],[-.33,2.12,-.08],[-.34,1.83,-.08],[-.29,1.46,-.16],[-.18,1.04,-.34],[-.125,.67,-.37]],[[0,.19,.177],[.17,.182,.166],[.37,.14,.142],[.45,.126,.123],[.58,.142,.125],[.73,.103,.095],[.92,.072,.068],[1,.077,.073]],M.skin,{nu:48,nv:96,name:'Rear weight-bearing leg'});
  sweep(parent,[[.274,2.91,.05],[.258,2.50,.09],[.22,2.03,.135],[.20,1.77,.19],[.185,1.36,.25],[.105,.72,.39],[.065,.26,.48]],[[0,.202,.181],[.16,.193,.176],[.35,.153,.143],[.46,.132,.127],[.59,.149,.13],[.75,.106,.092],[.92,.073,.071],[1,.075,.069]],M.skin,{nu:48,nv:96,name:'Forward relaxed leg'});
 }
 function slipper(parent,M,center,rot){
@@ -136,14 +136,14 @@ function slipper(parent,M,center,rot){
  ellipsoid(bow,M.pink,[0,.002,.011],[.024,.028,.025],null,'Ribbon knot');
 }
 function pillow(parent,M){
- const g=group(parent,'Soft white bed pillow');g.position.set(1.18,1.90,.22);g.rotation.set(-.08,.03,-.59);
- const hw=.70,hh=.90;
+ const g=group(parent,'Soft white bed pillow');g.position.set(1.18,1.82,-.18);g.rotation.set(.33,.03,-.55);
+ const hw=.76,hh=1.03;
  function coord(u,v,sign){
   const x=u*hw*(1-.095*(1-v*v))+.022*Math.sin(v*4.2)*(u+1)/2,y=v*hh*(1-.064*(1-u*u))+.024*Math.sin(u*3.3)*(v+1)/2;
   const edge=Math.max(0,(1-u*u)*(1-v*v)),puff=.30*Math.pow(edge,.43);
-  const fold1=.040*Math.exp(-(((u+.72+(v-.75)*.19)/.095)**2))*Math.exp(-(((v-.62)/.38)**2));
-  const fold2=.025*Math.exp(-(((u-.75-(v+.45)*.23)/.12)**2))*Math.exp(-(((v+.52)/.46)**2));
-  const pinch=.068*Math.exp(-((u+1)**2+(v-1)**2)/.11);const gripFold=.050*Math.exp(-(((u+.80+(1-v)*.47)/.095)**2))*Math.exp(-(((v-.62)/.48)**2));
+  const fold1=.061*Math.exp(-(((u+.72+(v-.75)*.19)/.095)**2))*Math.exp(-(((v-.62)/.38)**2));
+  const fold2=.044*Math.exp(-(((u-.75-(v+.45)*.23)/.12)**2))*Math.exp(-(((v+.52)/.46)**2));
+  const pinch=.068*Math.exp(-((u+1)**2+(v-1)**2)/.11);const gripFold=.067*Math.exp(-(((u+.80+(1-v)*.47)/.095)**2))*Math.exp(-(((v-.62)/.48)**2));
   return [x,y,sign*(puff-(fold1+fold2+gripFold)*Math.sqrt(edge))+.015*Math.sin(u*3+v*3)*edge-pinch];
  }
  surface(g,96,112,(u,v)=>coord(u*2-1,v*2-1,1),M.pillow,'Inflated pillow front');
@@ -153,6 +153,6 @@ function pillow(parent,M){
 }
 export function createBody(parent,M){
  const b=group(parent,'Tailored pajamas, posed anatomy and pillow');
- pillow(b,M);legs(b,M);slipper(b,M,[-.246,.31,-.368],-.14);slipper(b,M,[.065,.005,.48],-.035);shorts(b,M);arms(b,M);shirt(b,M);sleeves(b,M);
+ pillow(b,M);legs(b,M);slipper(b,M,[-.125,.43,-.368],-.14);slipper(b,M,[.065,.005,.48],-.035);shorts(b,M);arms(b,M);shirt(b,M);sleeves(b,M);
  return b;
 }
